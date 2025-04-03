@@ -75,6 +75,7 @@ fun MainScreen(
             item { PromoBanner(bannerType = banner.value, navController = navController) }
             item { CategorySection(categoryList = categoryList, navController = navController) }
             item { FeaturedProducts(navController = navController, homeViewModel) }
+
         }
     }
 

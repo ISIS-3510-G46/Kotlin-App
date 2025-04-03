@@ -236,7 +236,7 @@ fun CreatePostScreen(navController: NavController, imageUri: String, viewModel: 
                         viewModel.submitPost { success ->
                             scope.launch {
                                 val message =
-                                    if (success) "Publicación exitosa" else "Error al publicar"
+                                    if (success) "Publicación exitosa" else "Error al publicar: Verifica tu conexion a internet e intenta nuevamente."
                                 snackbarHostState.showSnackbar(message)
                                 delay(300)
                                 navController.navigate("home")
