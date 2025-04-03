@@ -1,5 +1,6 @@
 package com.moviles.clothingapp.login.ui
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
@@ -18,6 +19,9 @@ import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.Trace
 import com.moviles.clothingapp.login.ResetPasswordViewModel
 import com.moviles.clothingapp.ui.utils.DarkGreen
+import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
+import com.moviles.clothingapp.ui.utils.NoInternetMessage
+
 
 @Composable
 fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewModel(), navController: NavHostController) {
@@ -25,6 +29,7 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
     val context = LocalContext.current
     val resetPasswordResult by resetPasswordViewModel.resetPasswordResult.observeAsState()
     val trace: Trace = remember { FirebasePerformance.getInstance().newTrace("ResetPassword_Loading") }
+
 
     // Efecto popup de link enviado
     LaunchedEffect(resetPasswordResult) {
@@ -36,10 +41,14 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
             is ResetPasswordViewModel.ResetPasswordResult.Failure -> {
                 Toast.makeText(context, "Error: El correo ingresado es invalido o no esta registrado.", Toast.LENGTH_SHORT).show()
             }
-            null -> TODO()
+            null -> {
+                //...
+            }
         }
         trace.stop()
     }
+
+
 
     Column(
         modifier = Modifier
@@ -48,7 +57,15 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
         verticalArrangement = Arrangement.Center
     )
 
+
+
+
     {
+        if (!isInternetAvailable(context)) {
+            Log.d("Status Internet", isInternetAvailable(context).toString())
+            NoInternetMessage(Modifier.height(100.dp))
+        }
+
         TextButton(
             onClick = { navController.navigate("login") },
             modifier = Modifier.padding(top = 8.dp)
@@ -81,6 +98,8 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
             fontWeight = FontWeight.Normal,
             modifier = Modifier.padding(bottom = 32.dp)
         )
+
+
     }
 }
 
