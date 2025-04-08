@@ -33,6 +33,10 @@ import com.moviles.clothingapp.ui.utils.BottomNavigationBar
 import com.moviles.clothingapp.ui.utils.SearchBar
 import com.moviles.clothingapp.post.PostViewModel
 import com.moviles.clothingapp.post.ui.PostItem
+import android.util.Log
+import androidx.compose.ui.platform.LocalContext
+import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
+import com.moviles.clothingapp.ui.utils.NoInternetMessage
 
 
 /*  Discover Screen/Section:
@@ -46,6 +50,7 @@ import com.moviles.clothingapp.post.ui.PostItem
 fun DiscoverScreen(navController: NavController, viewModel: PostViewModel, query: String) {
     val posts by viewModel.posts.collectAsState()
     var searchQuery by remember { mutableStateOf(query) }
+    val context = LocalContext.current
     val trace: Trace = FirebasePerformance.getInstance().newTrace("DiscoverScreen_trace")
     trace.start()
 
@@ -111,6 +116,11 @@ fun DiscoverScreen(navController: NavController, viewModel: PostViewModel, query
                         (searchQuery.isEmpty() || post.name.contains(searchQuery, ignoreCase = true)) &&
                         (minPrice.toIntOrNull()?.let { postPrice >= it } ?: true) &&
                         (maxPrice.toIntOrNull()?.let { postPrice <= it } ?: true)
+            }
+
+            if (!isInternetAvailable(context)) {
+                Log.d("Status Internet", isInternetAvailable(context).toString())
+                NoInternetMessage()
             }
 
             LazyVerticalGrid(

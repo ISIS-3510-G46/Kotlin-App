@@ -94,8 +94,14 @@ fun CreateAccountScreen(loginViewModel: LoginViewModel, navController: NavContro
 
         // Solo si hay error se muestra esto:
         signUpErrorMessage?.let { errorMsg ->
+            // Check if the error is related to no network detected
+            val errorMessage = if (errorMsg.contains("A Network error", ignoreCase = true)) {
+                "Por favor verifica tu conexion a internet para ingresar."
+            } else {
+                errorMsg // Default error message
+            }
             Text(
-                text = errorMsg,
+                text = errorMessage,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = 8.dp)

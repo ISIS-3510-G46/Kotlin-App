@@ -19,6 +19,9 @@ import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.Trace
 import com.moviles.clothingapp.login.ResetPasswordViewModel
 import com.moviles.clothingapp.ui.utils.DarkGreen
+import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
+import com.moviles.clothingapp.ui.utils.NoInternetMessage
+
 
 @Composable
 fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewModel(), navController: NavHostController) {
@@ -26,6 +29,7 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
     val context = LocalContext.current
     val resetPasswordResult by resetPasswordViewModel.resetPasswordResult.observeAsState()
     val trace: Trace = remember { FirebasePerformance.getInstance().newTrace("ResetPassword_Loading") }
+
 
     // Efecto popup de link enviado
     LaunchedEffect(resetPasswordResult) {
@@ -44,7 +48,7 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
         trace.stop()
     }
 
-
+    
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -52,7 +56,15 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
         verticalArrangement = Arrangement.Center
     )
 
+
+
+
     {
+        if (!isInternetAvailable(context)) {
+            Log.d("Status Internet", isInternetAvailable(context).toString())
+            NoInternetMessage(Modifier.height(100.dp))
+        }
+
         TextButton(
             onClick = { navController.navigate("login") },
             modifier = Modifier.padding(top = 8.dp)
@@ -91,6 +103,8 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
             fontWeight = FontWeight.Normal,
             modifier = Modifier.padding(bottom = 32.dp)
         )
+
+
     }
 }
 
