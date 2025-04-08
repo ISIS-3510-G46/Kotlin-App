@@ -36,19 +36,6 @@ class PostViewModel : ViewModel() {
     }
 
 
-    /* Fetch products by category (weather) */
-    fun fetchPostsByCategory(categoryId: String) {
-        viewModelScope.launch {
-            try {
-                val result = repository.fetchPostsByCategory(categoryId)
-                _posts.value = result ?: emptyList()
-            } catch (e: Exception) {
-                Log.e("PostViewModel", "Error fetching category $categoryId: ${e.message}")
-                _posts.value = emptyList()
-            }
-        }
-    }
-
     /* Fetch post by ID */
     fun fetchPostById(id: Int) {
         viewModelScope.launch {

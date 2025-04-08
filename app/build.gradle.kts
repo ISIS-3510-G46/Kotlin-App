@@ -19,8 +19,8 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "OPEN_WEATHER_API_KEY", "\"${project.findProperty("OPEN_WEATHER_API_KEY")}\"")
     }
 
     buildTypes {
@@ -41,11 +41,10 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-
-    buildFeatures {
+        buildConfig = true
         viewBinding = true
     }
+
 }
 
 dependencies {

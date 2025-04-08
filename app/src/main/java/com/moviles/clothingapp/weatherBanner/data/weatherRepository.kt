@@ -15,6 +15,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import com.moviles.clothingapp.BuildConfig
 
 
 
@@ -24,7 +25,8 @@ import retrofit2.http.Query
  */
 class WeatherRepository(private val context: Context) {
     private val BASE_URL = "https://api.openweathermap.org/data/2.5/" //API for weather
-    private val apiKey = "29344f015dc83230114628e1dbe1553c" // TODO: put this in a .env
+    private val apiKey = BuildConfig.OPEN_WEATHER_API_KEY
+
 
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val retrofit: Retrofit = Retrofit.Builder()
@@ -54,7 +56,8 @@ class WeatherRepository(private val context: Context) {
                     )
                     return response.body()
                 } else {
-                    Log.e("WeatherRepository", "Response failed: ${response.code()}")
+                    Log.e("WeatherRepository", "Response failed: ${response.body()}")
+                    Log.e("WeatherRepository", "Response failed: ${apiKey}")
                     null
                 }
             } catch (e: Exception) {
