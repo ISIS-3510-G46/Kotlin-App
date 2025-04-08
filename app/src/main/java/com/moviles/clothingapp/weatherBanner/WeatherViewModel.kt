@@ -5,9 +5,12 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moviles.clothingapp.post.data.PostData
+import com.moviles.clothingapp.post.data.PostRepository
 import com.moviles.clothingapp.weatherBanner.data.WeatherRepository
 import com.moviles.clothingapp.weatherBanner.data.WeatherResponse
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /* View Model for Weather:
@@ -21,6 +24,10 @@ class WeatherViewModel(context: Context, hasLocationPermission: Boolean = false)
     private val _hasLocationPermission = MutableStateFlow(hasLocationPermission)
     val weatherData = MutableLiveData<WeatherResponse?>()
     val bannerType = MutableLiveData<BannerType>()
+    private val repository = PostRepository()
+
+    private val _posts = MutableStateFlow(emptyList<PostData>())
+    val posts: StateFlow<List<PostData>> get() = _posts
 
     enum class BannerType {
         LIGHT_CLOTHING,
@@ -66,6 +73,19 @@ class WeatherViewModel(context: Context, hasLocationPermission: Boolean = false)
             bannerType.value = banner
         } else {
             bannerType.value = BannerType.NO_WEATHER_DATA
+        }
+    }
+
+    /* Fetch products by category (weather) */
+    fun fetchPostsByCategory(categoryId: String) {
+        viewModelScope.launch {
+            try {
+                val result = repository.fetchPostsByCategory(categoryId)
+                _posts.value = result ?: emptyList()
+            } catch (e: Exception) {
+                Log.e("PostViewModel", "Error fetching category $categoryId: ${e.message}")
+                _posts.value = emptyList()
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ import androidx.navigation.NavController
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.Trace
 import com.moviles.clothingapp.ui.utils.DarkGreen
-import com.moviles.clothingapp.post.PostViewModel
+import com.moviles.clothingapp.weatherBanner.WeatherViewModel
 import com.moviles.clothingapp.post.ui.PostItem
 
 
@@ -27,7 +27,7 @@ import com.moviles.clothingapp.post.ui.PostItem
 *   - TODO: link each post to its detailed page.
 */
 @Composable
-fun WeatherCategoryScreen(categoryId: String, navController: NavController, viewModel: PostViewModel) {
+fun WeatherCategoryScreen(categoryId: String, navController: NavController, viewModel: WeatherViewModel) {
     val trace: Trace = FirebasePerformance.getInstance().newTrace("WeatherClothesScreen_trace")
     trace.start()
     /* Launch the query for category of weather */

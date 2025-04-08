@@ -1,5 +1,6 @@
 package com.moviles.clothingapp.login.ui
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
@@ -28,18 +29,21 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
 
     // Efecto popup de link enviado
     LaunchedEffect(resetPasswordResult) {
+        resetPasswordResult ?: return@LaunchedEffect
+
         trace.start()
         when (resetPasswordResult) {
             is ResetPasswordViewModel.ResetPasswordResult.Success -> {
-                Toast.makeText(context, "Correo de recuperacion enviado.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Correo de recuperación enviado.", Toast.LENGTH_SHORT).show()
             }
             is ResetPasswordViewModel.ResetPasswordResult.Failure -> {
-                Toast.makeText(context, "Error: El correo ingresado es invalido o no esta registrado.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error: El correo ingresado es inválido o no está registrado.", Toast.LENGTH_SHORT).show()
             }
-            null -> TODO()
+            null -> Log.d("ResetPasswordScreen", "resetPasswordResult is null")
         }
         trace.stop()
     }
+
 
     Column(
         modifier = Modifier
@@ -68,7 +72,13 @@ fun ResetPasswordScreen(resetPasswordViewModel: ResetPasswordViewModel = viewMod
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = { resetPasswordViewModel.sendPasswordResetEmail(email) },
+            onClick = {
+                if (email.isBlank()) {
+                    Toast.makeText(context, "Por favor ingresa tu correo electrónico.", Toast.LENGTH_SHORT).show()
+                } else {
+                    resetPasswordViewModel.sendPasswordResetEmail(email)
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = DarkGreen)
         ) {

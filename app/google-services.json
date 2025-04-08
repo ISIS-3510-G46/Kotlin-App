@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "325369786694",
-    "project_id": "fir-clothingapp-420b1",
-    "storage_bucket": "fir-clothingapp-420b1.firebasestorage.app"
+    "project_number": "242119672529",
+    "project_id": "clothingapp-e3608",
+    "storage_bucket": "clothingapp-e3608.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:325369786694:android:96c8e6c31145cafd8d7547",
+        "mobilesdk_app_id": "1:242119672529:android:d5cc4fdfc66992a0ecfbf0",
         "android_client_info": {
           "package_name": "com.moviles.clothingapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAIEKSZHM1Ipz5wIow6p_bqea2sDFh2gXo"
+          "current_key": "AIzaSyA6zy-J5qN7X5sKb99CIE1O-eS_PFhBcXo"
         }
       ],
       "services": {

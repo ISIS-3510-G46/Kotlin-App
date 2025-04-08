@@ -85,8 +85,7 @@ fun AppNavigation(navController: NavHostController,
             arguments = listOf(navArgument("categoryId") { type = NavType.StringType })
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId") ?: "sale"
-            val postViewModel: PostViewModel = viewModel()
-            WeatherCategoryScreen(categoryId = categoryId, navController, viewModel = postViewModel)
+            WeatherCategoryScreen(categoryId = categoryId, navController, viewModel = weatherViewModel)
         }
 
 
