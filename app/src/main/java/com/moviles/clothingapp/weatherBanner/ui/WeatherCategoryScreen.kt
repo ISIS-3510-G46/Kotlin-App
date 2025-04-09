@@ -23,6 +23,8 @@ import com.moviles.clothingapp.weatherBanner.WeatherViewModel
 import com.moviles.clothingapp.post.ui.PostItem
 import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
 import com.moviles.clothingapp.ui.utils.NoInternetMessage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 /* Screen to see after clicking the home's promoBanner:
@@ -34,20 +36,17 @@ import com.moviles.clothingapp.ui.utils.NoInternetMessage
 fun WeatherCategoryScreen(categoryId: String, navController: NavController, viewModel: WeatherViewModel) {
     val trace: Trace = FirebasePerformance.getInstance().newTrace("WeatherClothesScreen_trace")
     val context = LocalContext.current
-    trace.start()
+
     /* Launch the query for category of weather */
     LaunchedEffect(categoryId) {
+        trace.start()
         viewModel.fetchPostsByCategory(categoryId)
     }
 
     val posts by viewModel.posts.collectAsState()
-
-    LaunchedEffect(posts) {
-        if (posts.isNotEmpty()) {
-            trace.stop()
-        }
+    if (posts.isNotEmpty()){
+        trace.stop()
     }
-
 
 
     Column(modifier = Modifier.fillMaxSize()) {

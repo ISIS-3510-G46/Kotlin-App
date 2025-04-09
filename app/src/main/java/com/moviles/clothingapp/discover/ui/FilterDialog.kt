@@ -34,7 +34,7 @@ import com.moviles.clothingapp.ui.utils.figtreeFamily
 * */
 @Composable
 fun FilterDialog(
-    onDismiss: () -> Unit,
+    onDismiss: () -> Unit, // Unit = void (returns void)
     selectedColor: String,
     onColorChange: (String) -> Unit,
     selectedSize: String,

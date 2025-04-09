@@ -9,9 +9,11 @@ import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.post.data.PostRepository
 import com.moviles.clothingapp.weatherBanner.data.WeatherRepository
 import com.moviles.clothingapp.weatherBanner.data.WeatherResponse
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /* View Model for Weather:
 *   - Connects directly with weatherData and weatherRepository (which get the user's location and weather info)
@@ -22,7 +24,7 @@ import kotlinx.coroutines.launch
 class WeatherViewModel(context: Context, hasLocationPermission: Boolean = false) : ViewModel() {
     private val weatherRepository = WeatherRepository(context)
     private val _hasLocationPermission = MutableStateFlow(hasLocationPermission)
-    val weatherData = MutableLiveData<WeatherResponse?>()
+    private val weatherData = MutableLiveData<WeatherResponse?>()
     val bannerType = MutableLiveData<BannerType>()
     private val repository = PostRepository()
 
@@ -37,9 +39,6 @@ class WeatherViewModel(context: Context, hasLocationPermission: Boolean = false)
         NO_WEATHER_DATA
     }
 
-    init {
-        fetchWeatherData()
-    }
 
     fun updateLocationPermission(granted: Boolean) {
         _hasLocationPermission.value = granted
@@ -47,11 +46,13 @@ class WeatherViewModel(context: Context, hasLocationPermission: Boolean = false)
     }
 
     fun fetchWeatherData() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val data = weatherRepository.getWeatherData(_hasLocationPermission.value)
-                weatherData.value = data
-                generateRecommendations(data)
+                withContext(Dispatchers.Main) {
+                    weatherData.value = data
+                    generateRecommendations(data)
+                }
             } catch (e: Exception) {
                 Log.e("WeatherViewModel", "Error fetching weather data", e)
                 bannerType.value = BannerType.NO_WEATHER_DATA
@@ -78,13 +79,14 @@ class WeatherViewModel(context: Context, hasLocationPermission: Boolean = false)
 
     /* Fetch products by category (weather) */
     fun fetchPostsByCategory(categoryId: String) {
-        viewModelScope.launch {
+        /* Network/database operations run on IO thread */
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = repository.fetchPostsByCategory(categoryId)
                 _posts.value = result ?: emptyList()
             } catch (e: Exception) {
                 Log.e("PostViewModel", "Error fetching category $categoryId: ${e.message}")
-                _posts.value = emptyList()
+                    _posts.value = emptyList()
             }
         }
     }

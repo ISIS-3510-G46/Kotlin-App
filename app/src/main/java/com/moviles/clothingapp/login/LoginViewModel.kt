@@ -6,11 +6,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-
+import kotlinx.coroutines.withContext
 
 
 /*  Login ViewModel:
@@ -45,45 +46,48 @@ class LoginViewModel(private val auth: FirebaseAuth) : ViewModel() {
     }
 
     fun signIn(email: String, password: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (email.isBlank() || password.isBlank()) {
-                    _signInErrorMessage.value = "Email y contraseña no pueden estar vacíos"
+                    withContext(Dispatchers.Main) {
+                        _signInErrorMessage.value = "Email y contraseña no pueden estar vacíos"
+                    }
                     return@launch
                 }
 
-                auth.signInWithEmailAndPassword(email, password) // Sign in with Firebase
-                    .await()
-                _navigateToHome.value = true // Navigate to the home screen
-
+                auth.signInWithEmailAndPassword(email, password).await()
+                withContext(Dispatchers.Main) {
+                    _navigateToHome.value = true
+                }
 
             } catch (e: Exception) {
                 val errorMessage = when (e) {
                     is FirebaseAuthInvalidCredentialsException ->
                         "Correo o contraseña incorrectos"
-
                     else ->
                         "Error al iniciar sesión: ${e.localizedMessage ?: "Intenta de nuevo más tarde"}"
                 }
-                _signInErrorMessage.value = errorMessage
+                withContext(Dispatchers.Main) {
+                    _signInErrorMessage.value = errorMessage
+                }
             }
         }
     }
 
-
     fun signUp(email: String, password: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (email.isBlank() || password.isBlank()) {
-                    _signUpErrorMessage.value = "Email y contraseña no pueden estar vacíos"
+                    withContext(Dispatchers.Main) {
+                        _signUpErrorMessage.value = "Email y contraseña no pueden estar vacíos"
+                    }
                     return@launch
                 }
 
-
                 auth.createUserWithEmailAndPassword(email, password).await()
-                val user = auth.currentUser
-                _navigateToHome.value = true
-
+                withContext(Dispatchers.Main) {
+                    _navigateToHome.value = true
+                }
 
             } catch (e: Exception) {
                 val errorMessage = when (e) {
@@ -95,7 +99,9 @@ class LoginViewModel(private val auth: FirebaseAuth) : ViewModel() {
                         "Formato de correo inválido"
                     else -> "Error al crear cuenta: ${e.localizedMessage ?: "Error desconocido"}"
                 }
-                _signUpErrorMessage.value = errorMessage
+                withContext(Dispatchers.Main) {
+                    _signUpErrorMessage.value = errorMessage
+                }
             }
         }
     }

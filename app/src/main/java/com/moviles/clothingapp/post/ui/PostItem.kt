@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.ui.utils.figtreeFamily
@@ -24,10 +26,12 @@ import com.moviles.clothingapp.ui.utils.figtreeFamily
 fun PostItem(post: PostData, onClick: () -> Unit) {
     val bucketId = "67ddf3860035ee6bd725"
     val projectId = "moviles"
-    val imageUrl = if (post.image.startsWith("http")) { // If seeder image is in URL if not in bucket
-        post.image
-    } else {
-        "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${post.image}/view?project=$projectId"
+    val imageUrl = remember(post.image) {
+        if (post.image.startsWith("http")) { // If seeder image is in URL if not in bucket
+            post.image
+        } else {
+            "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${post.image}/view?project=$projectId"
+        }
     }
 
     Card(
@@ -43,6 +47,7 @@ fun PostItem(post: PostData, onClick: () -> Unit) {
             AsyncImage(
                 model = imageUrl,
                 contentDescription = post.name,
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)

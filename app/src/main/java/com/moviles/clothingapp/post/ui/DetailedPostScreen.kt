@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.moviles.clothingapp.cart.CartViewModel
@@ -42,8 +43,8 @@ fun DetailedPostScreen(
     onBack: () -> Unit,
     onNavigateToCart: () -> Unit
 ) {
-    val product by viewModel.post.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val product by viewModel.post.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(productId) {
@@ -60,10 +61,12 @@ fun DetailedPostScreen(
         product != null -> {
             val bucketId = "67ddf3860035ee6bd725"
             val projectId = "moviles"
-            val imageUrl = if (product!!.image.startsWith("http")) {
-                product!!.image
-            } else {
-                "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${product!!.image}/view?project=$projectId"
+            val imageUrl = remember(product!!.image) {
+                if (product!!.image.startsWith("http")) {
+                    product!!.image
+                } else {
+                    "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${product!!.image}/view?project=$projectId"
+                }
             }
 
 
