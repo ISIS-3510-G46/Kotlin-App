@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.moviles.clothingapp.BuildConfig
 import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.post.PostViewModel
 import com.moviles.clothingapp.ui.utils.DarkGreen
@@ -59,7 +60,7 @@ fun DetailedPostScreen(
         }
 
         product != null -> {
-            val bucketId = "67ddf3860035ee6bd725"
+            val bucketId = BuildConfig.BUCKET_ID
             val projectId = "moviles"
             val imageUrl = remember(product!!.image) {
                 if (product!!.image.startsWith("http")) {
@@ -108,7 +109,7 @@ fun DetailedPostScreen(
                         )
                     }
 
-                    // Favorite button
+                    /* Favorite button implementation on hold for now
                     IconButton(
                         onClick = { /* Add favorite functionality */ },
                         modifier = Modifier
@@ -123,7 +124,9 @@ fun DetailedPostScreen(
                             tint = Color.Black
                         )
                     }
+                    */
                 }
+
 
                 // Product details
                 Column(

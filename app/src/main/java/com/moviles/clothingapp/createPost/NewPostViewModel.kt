@@ -94,13 +94,12 @@ class NewPostViewModel(application: Application) : AndroidViewModel(application)
             try {
 
                 val context = getApplication<Application>().applicationContext
-                val bucketId = "67ddf3860035ee6bd725"
 
                 // Upload Image First
                 val imageUrl = withContext(Dispatchers.IO) {
                     _imageUri.value?.let { uriString ->
                         val uri = Uri.parse(uriString)
-                        appwriteRepository.uploadImage(context, uri, bucketId)
+                        appwriteRepository.uploadImage(context, uri)
                     }
                 }
 

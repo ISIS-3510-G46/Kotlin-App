@@ -13,6 +13,7 @@ import coil.compose.AsyncImage
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import com.moviles.clothingapp.BuildConfig
 import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.ui.utils.figtreeFamily
 
@@ -24,7 +25,7 @@ import com.moviles.clothingapp.ui.utils.figtreeFamily
  */
 @Composable
 fun PostItem(post: PostData, onClick: () -> Unit) {
-    val bucketId = "67ddf3860035ee6bd725"
+    val bucketId = BuildConfig.BUCKET_ID
     val projectId = "moviles"
     val imageUrl = remember(post.image) {
         if (post.image.startsWith("http")) { // If seeder image is in URL if not in bucket

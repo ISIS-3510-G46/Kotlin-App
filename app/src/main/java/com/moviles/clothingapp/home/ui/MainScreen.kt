@@ -72,9 +72,10 @@ fun MainScreen(
                         navController.navigate("discover/${searchText.value}")
                     }
                 )
+                Spacer(Modifier.height(8.dp))
             }
 
-            item { QuickActions() }
+            //item { QuickActions() } d
             item { PromoBanner(bannerType = banner.value, navController = navController) }
             item { CategorySection(categoryList = categoryList, navController = navController) }
             item { FeaturedProducts(navController = navController, homeViewModel) }
