@@ -2,6 +2,8 @@ package com.moviles.clothingapp.createPost.data
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
+import com.moviles.clothingapp.BuildConfig
 import io.appwrite.Client
 import io.appwrite.models.InputFile
 import io.appwrite.services.Storage
@@ -30,12 +32,14 @@ class ImageStoringRepository(context: Context) {
     }
 
     // Upload image file in bucket in AppWrite bucket
-    suspend fun uploadImage(context: Context, imageUri: Uri, bucketId: String): String? {
+    suspend fun uploadImage(context: Context, imageUri: Uri): String? {
         return try {
             val imageFile = uriToFile(context, imageUri)
             val inputFile = InputFile.fromFile(imageFile)
+            val bucketId = BuildConfig.BUCKET_ID
 
             val response = storage.createFile(bucketId, "unique()", inputFile)
+            Log.d("response", response.toString())
             response.id // Return file ID
         } catch (e: Exception) {
             e.printStackTrace()

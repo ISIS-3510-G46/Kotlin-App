@@ -88,15 +88,13 @@ fun CreatePostScreen(navController: NavController, imageUri: String, viewModel: 
                 }
 
                 /* Show taken image by user */
-                imageUri.let {
-                    Image(
-                        painter = rememberAsyncImagePainter(it),
-                        contentDescription = "Captured Image",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    )
-                }
+                Image(
+                    painter = rememberAsyncImagePainter(imageUri),
+                    contentDescription = "Captured Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -238,7 +236,7 @@ fun CreatePostScreen(navController: NavController, imageUri: String, viewModel: 
                                 val message =
                                     if (success) "Publicación exitosa" else "Error al publicar: Verifica tu conexion a internet e intenta nuevamente."
                                 snackbarHostState.showSnackbar(message)
-                                delay(300)
+                                delay(100)
                                 navController.navigate("home")
                             }
                         }

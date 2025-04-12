@@ -41,6 +41,9 @@ fun MainScreen(
     val trace: Trace = remember { FirebasePerformance.getInstance().newTrace("MainScreen_Loading") }
     LaunchedEffect(Unit) {
         trace.start() // Start tracing when screen loads
+        if (banner.value != null){
+            trace.stop()
+        }
     }
 
     Scaffold(
@@ -69,19 +72,14 @@ fun MainScreen(
                         navController.navigate("discover/${searchText.value}")
                     }
                 )
+                Spacer(Modifier.height(8.dp))
             }
 
-            item { QuickActions() }
+            //item { QuickActions() } d
             item { PromoBanner(bannerType = banner.value, navController = navController) }
             item { CategorySection(categoryList = categoryList, navController = navController) }
             item { FeaturedProducts(navController = navController, homeViewModel) }
 
         }
-    }
-
-
-    // Stop trace metric (ms) when banner has been loaded
-    LaunchedEffect(banner.value) {
-        trace.stop()
     }
 }

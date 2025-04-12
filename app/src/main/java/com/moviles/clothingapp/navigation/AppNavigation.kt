@@ -2,8 +2,8 @@ package com.moviles.clothingapp.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -43,7 +43,7 @@ fun AppNavigation(navController: NavHostController,
 ) {
 
     /* Check if user is already logged in and navigate accordingly */
-    val isUserLoggedIn by loginViewModel.navigateToHome.collectAsState()
+    val isUserLoggedIn by loginViewModel.navigateToHome.collectAsStateWithLifecycle()
 
     /* Start navigation in login page. Route: login */
     NavHost(navController = navController, startDestination = if (isUserLoggedIn) "home" else "login") {

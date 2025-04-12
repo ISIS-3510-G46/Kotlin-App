@@ -21,6 +21,7 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "OPEN_WEATHER_API_KEY", "\"${project.findProperty("OPEN_WEATHER_API_KEY")}\"")
+        buildConfigField ("String", "BUCKET_ID", "\"${project.findProperty("STORAGE_ID")}\"")
     }
 
     buildTypes {

@@ -1,10 +1,12 @@
 package com.moviles.clothingapp.home
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.post.data.PostRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.withContext
 
 
 /*  HomeViewModel:
@@ -22,10 +24,13 @@ class HomeViewModel : ViewModel() {
         getPostData()
     }
 
-    fun getPostData() {
-        viewModelScope.launch {
+    private fun getPostData() {
+        viewModelScope.launch(Dispatchers.IO) {
             val postResult = postRepository.fetchRepository()
-            _postData.postValue(postResult ?: emptyList())
+            withContext(Dispatchers.Main) {
+                _postData.postValue(postResult ?: emptyList())
+            }
+
         }
     }
 }

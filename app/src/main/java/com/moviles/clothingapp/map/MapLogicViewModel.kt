@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import android.annotation.SuppressLint
 import android.app.Application
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,6 +15,12 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.moviles.clothingapp.map.data.Shop
+import com.moviles.clothingapp.map.data.ShopsData
+import com.moviles.clothingapp.ui.utils.NetworkHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class MapLogicViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -29,54 +36,67 @@ class MapLogicViewModel(application: Application) : AndroidViewModel(application
 
     /* Default location - Mario Laserna Building */
     val defaultLocation = LatLng(4.602904573111566, -74.06503868957138)
+    private val appContext = getApplication<Application>().applicationContext
 
 
     /* Shop fetching */
-    data class Shop(val name: String, val location: LatLng, val address: String)
-    private val _shopLocations = MutableLiveData<List<Shop>>()
-    val shopLocations: LiveData<List<Shop>> = _shopLocations
+    val shopLocations: LiveData<List<Shop>> = MutableLiveData(ShopsData.shopLocations)
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
-    /* Load shops locations and User location */
+
+
+    /* Load User location */
     init {
-        loadShops()
         getUserLocation()
+        _isLoading.value = false
     }
 
-    private fun loadShops() {
-        _shopLocations.value = listOf(
-            Shop("E-Social", LatLng(4.653340400226082, -74.06102567572646), "Cra. 11 #67-46, Bogotá"),
-            Shop("Planeta Vintage", LatLng(4.623326334617368, -74.06886427667965), "Cra. 13a #34-57, Bogotá"),
-            Shop("El Segundazo", LatLng(4.674183693422512, -74.05288283864145), "Cl. 90 #14-45, Chapinero, Bogotá"),
-            Shop("El Baulito de Mr.Bean", LatLng(4.653041858350189, -74.06386070551471), "Av. Caracas #65a-66, Bogotá"),
-            Shop("Closet Up", LatLng(4.654346890637457, -74.06057896133835), "Cra. 11 #69-26, Bogotá"),
-            Shop("El Cuchitril", LatLng(4.693857895240825, -74.03082026318502), "Cl. 117 #5A-13, Bogotá"),
-            Shop("Herbario Vintage", LatLng(4.624205328397987, -74.07014419017378), "Cra 15 #35-12, Bogotá")
-        )
+    init {
+        Log.d("ViewModelLifecycle", "${this.javaClass.simpleName} created")
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("ViewModelLifecycle", "${this.javaClass.simpleName} destroyed")
+    }
+
 
     /* Get user location or put it in default location */
     @SuppressLint("MissingPermission")
     fun getUserLocation() {
-        viewModelScope.launch {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                if (location != null) {
-                    val userLatLng = LatLng(location.latitude, location.longitude)
-                    _userLocation.value = userLatLng
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(userLatLng, 15f)
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val hasInternet = NetworkHelper.isInternetAvailable(appContext)
+                val location = if (hasInternet) {
+                    fusedLocationClient.lastLocation.await()
                 } else {
-                    _userLocation.value = defaultLocation
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(defaultLocation, 12f)
+                    null
                 }
-            }.addOnFailureListener {
-                _userLocation.value = defaultLocation
-                cameraPositionState.position = CameraPosition.fromLatLngZoom(defaultLocation, 12f)
+                val userLatLng = location?.let {
+                    LatLng(it.latitude, it.longitude)
+                } ?: defaultLocation
+                val zoom = if (location != null) 15f else 12f
+
+                withContext(Dispatchers.Main) {
+                    _userLocation.value = userLatLng
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(userLatLng, zoom)
+                    _isLoading.value = false
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _userLocation.value = defaultLocation
+                    cameraPositionState.position =
+                        CameraPosition.fromLatLngZoom(defaultLocation, 12f)
+                }
             }
         }
     }
 
     /* Function to focus the map view if a store from list is selected */
     fun focusOnLocation(location: LatLng) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             cameraPositionState.animate(
                 CameraUpdateFactory.newCameraPosition(
                     CameraPosition.Builder()

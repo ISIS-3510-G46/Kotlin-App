@@ -9,7 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.moviles.clothingapp.createPost.data.ImageStoringRepository
 import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.post.data.PostRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.DecimalFormat
 
 
@@ -66,10 +68,10 @@ class NewPostViewModel(application: Application) : AndroidViewModel(application)
     fun setGroup(group: String) { _selectedGroup.value = group }
     fun setColor(color: String) { _selectedColor.value = color }
     fun setPrice(newPrice: String) {
+        viewModelScope.launch(Dispatchers.Default) {
         if (newPrice.isEmpty()) {
             _price.value = ""
             _formattedPrice.value = ""
-            return
         }
         _price.value = newPrice
         try {
@@ -79,6 +81,7 @@ class NewPostViewModel(application: Application) : AndroidViewModel(application)
         } catch (e: Exception) {
             _formattedPrice.value = newPrice
         }
+        }
     }
     fun setImage(uri: String?) {
         _imageUri.value = uri
@@ -87,15 +90,19 @@ class NewPostViewModel(application: Application) : AndroidViewModel(application)
 
     /* Submit Post function to send the data gotten by UI to the repository */
     fun submitPost(onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch (Dispatchers.IO) {
             try {
 
                 val context = getApplication<Application>().applicationContext
-                val bucketId = "67ddf3860035ee6bd725"
 
                 // Upload Image First
-                val imageUri = _imageUri.value?.let { Uri.parse(it) }  // Convert String to Uri
-                val imageUrl = imageUri?.let { appwriteRepository.uploadImage(context, it, bucketId) }
+                val imageUrl = withContext(Dispatchers.IO) {
+                    _imageUri.value?.let { uriString ->
+                        val uri = Uri.parse(uriString)
+                        appwriteRepository.uploadImage(context, uri)
+                    }
+                }
+
 
 
                 if (imageUrl == null) {
@@ -114,11 +121,17 @@ class NewPostViewModel(application: Application) : AndroidViewModel(application)
                     color = selectedColor.value
                 )
 
-                val response = repository.createPost(newPost)
-                onResult(response != null)  // Notify success or failure
+                val response = withContext(Dispatchers.IO){
+                    repository.createPost(newPost)
+                }
+                withContext(Dispatchers.Main){
+                    onResult(response != null)  // Notify success or failure
+                }
             } catch (e: Exception) {
                 e.printStackTrace()  // Log error for debugging
-                onResult(false)  // Notify failure
+                withContext(Dispatchers.Main) {
+                    onResult(false)
+                }
             }
         }
     }
