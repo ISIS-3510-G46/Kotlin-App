@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.ShoppingCart
@@ -32,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.moviles.clothingapp.BuildConfig
 import com.moviles.clothingapp.cart.CartViewModel
+import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import com.moviles.clothingapp.post.PostViewModel
 import com.moviles.clothingapp.ui.utils.DarkGreen
 import com.moviles.clothingapp.ui.utils.Red
@@ -40,16 +42,27 @@ import com.moviles.clothingapp.ui.utils.Red
 fun DetailedPostScreen(
     productId: Int,
     viewModel: PostViewModel = viewModel(),
+    favoritesViewModel: FavoritesViewModel,
     cartViewModel: CartViewModel,
     onBack: () -> Unit,
     onNavigateToCart: () -> Unit
 ) {
     val product by viewModel.post.collectAsStateWithLifecycle()
+    val isFavorite = remember(product) {
+        mutableStateOf(false)
+    }
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(productId) {
         viewModel.fetchPostById(productId)
+    }
+
+    LaunchedEffect(product) {
+        product?.id?.let { postId ->
+            val isProductFavorite = favoritesViewModel.isFavorite(context, postId)
+            isFavorite.value = isProductFavorite
+        }
     }
 
     when {
@@ -109,9 +122,13 @@ fun DetailedPostScreen(
                         )
                     }
 
-                    /* Favorite button implementation on hold for now
                     IconButton(
-                        onClick = { /* Add favorite functionality */ },
+                        onClick = {
+                            product?.id.let { postId ->
+                                isFavorite.value = !isFavorite.value
+                                favoritesViewModel.newFavorite(context, product!!)
+                            }
+                        },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(16.dp)
@@ -119,12 +136,15 @@ fun DetailedPostScreen(
                             .background(Color.White, CircleShape)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.FavoriteBorder,
+                            imageVector = if (isFavorite.value)
+                                Icons.Rounded.Favorite
+                            else
+                                Icons.Default.FavoriteBorder,
                             contentDescription = "Favorite",
                             tint = Color.Black
                         )
                     }
-                    */
+
                 }
 
 

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.moviles.clothingapp.BuildConfig
 import com.moviles.clothingapp.cart.data.CartItemData
 import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.ui.utils.BottomNavigationBar
@@ -64,7 +65,7 @@ fun CartScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "Empty Cart",
+                            contentDescription = "Carrito vacío",
                             modifier = Modifier.size(100.dp),
                             tint = Color.LightGray
                         )
@@ -111,7 +112,8 @@ fun CartScreen(
                                 } catch (e: Exception) {
                                     Log.e("CartScreen", "Failed to del item: $productId", e)
                                 }
-                            }
+                            },
+                            navController
                         )
                     }
                 }
@@ -139,10 +141,11 @@ fun CartScreen(
 @Composable
 fun CartItemCard(
     cartItem: CartItemData,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    navController: NavController
 ) {
     val product = cartItem.product
-    val bucketId = "67ddf3860035ee6bd725"
+    val bucketId = BuildConfig.BUCKET_ID
     val projectId = "moviles"
     val imageUrl = if (product.image.startsWith("http")) {
         product.image
@@ -155,7 +158,8 @@ fun CartItemCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        onClick = { navController.navigate("detailedPost/${product.id}") }
     ) {
         Row(
             modifier = Modifier

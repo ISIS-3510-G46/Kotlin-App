@@ -6,6 +6,7 @@ plugins {
     id("com.google.firebase.firebase-perf")
     id("com.google.gms.google-services")
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("com.google.devtools.ksp")
 }
 
 
@@ -90,6 +91,14 @@ dependencies {
 
     // Image Storage
     implementation("io.appwrite:sdk-for-android:6.1.0")
+
+    // ROOM
+    implementation ("androidx.room:room-runtime:2.6.1")
+    implementation ("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.5.0")
+
+    // Swipe refresh
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.27.0")
 
 
 

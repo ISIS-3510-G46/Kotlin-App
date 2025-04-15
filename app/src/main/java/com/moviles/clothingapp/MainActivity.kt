@@ -23,7 +23,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.perf.FirebasePerformance
 import com.moviles.clothingapp.cart.CartViewModel
-import kotlinx.coroutines.CoroutineScope
+import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
     private val loginViewModel by lazy { LoginViewModel(Firebase.auth) }
     private val resetPasswordViewModel by lazy { ResetPasswordViewModel(Firebase.auth) }
     private val weatherViewModel by lazy { WeatherViewModel(this, false) }
+    private val favoritesViewModel: FavoritesViewModel by viewModels()
 
 
 
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            AppNavigation(navController, loginViewModel, resetPasswordViewModel, weatherViewModel, cartViewModel)
+            AppNavigation(navController, loginViewModel, resetPasswordViewModel, weatherViewModel, cartViewModel, favoritesViewModel)
         }
 
         /* Request location permissions */
@@ -55,6 +56,7 @@ class MainActivity : ComponentActivity() {
 
         /* Log device information and metrics for firebase */
         logDeviceInfo()
+
     }
 
 
@@ -99,5 +101,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }

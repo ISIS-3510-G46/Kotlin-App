@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -30,6 +31,10 @@ fun FeaturedProducts(navController: NavController, viewModel: HomeViewModel) {
     val allProducts by viewModel.postData.observeAsState(emptyList())
     val products = allProducts.takeLast(6)
     val context = LocalContext.current
+
+    LaunchedEffect(allProducts.size) {
+        Log.d("FeaturedProducts", "Products updated, size: ${allProducts.size}")
+    }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
