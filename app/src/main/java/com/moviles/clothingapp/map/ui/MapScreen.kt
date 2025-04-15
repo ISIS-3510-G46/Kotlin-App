@@ -82,36 +82,42 @@ fun MapScreen(navController: NavController, viewModel: MapLogicViewModel = viewM
                         )
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(450.dp) /* Height for the map */
-                    ) {
-                        GoogleMap(
-                            modifier = Modifier.fillMaxSize(),
-                            cameraPositionState = viewModel.cameraPositionState
+                    else{
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(450.dp) /* Height for the map */
                         ) {
-                            /* User location marker (blue marker) */
-                            userLocation?.let { latLng ->
-                                Marker(
-                                    state = rememberMarkerState(position = latLng),
-                                    title = "You are here",
-                                    icon = BitmapDescriptorFactory.defaultMarker(
-                                        BitmapDescriptorFactory.HUE_BLUE
+                            GoogleMap(
+                                modifier = Modifier.fillMaxSize(),
+                                cameraPositionState = viewModel.cameraPositionState
+                            ) {
+                                /* User location marker (blue marker) */
+                                userLocation?.let { latLng ->
+                                    Marker(
+                                        state = rememberMarkerState(position = latLng),
+                                        title = "You are here",
+                                        icon = BitmapDescriptorFactory.defaultMarker(
+                                            BitmapDescriptorFactory.HUE_BLUE
+                                        )
                                     )
-                                )
-                            }
+                                }
 
-                            /* Shop Markers */
-                            shopLocations.forEach { shop ->
-                                Marker(
-                                    state = rememberMarkerState(position = shop.location),
-                                    title = shop.name
-                                )
-                            }
+                                /* Shop Markers */
+                                shopLocations.forEach { shop ->
+                                    Marker(
+                                        state = rememberMarkerState(position = shop.location),
+                                        title = shop.name
+                                    )
+                                }
 
+                            }
                         }
+
                     }
+
+
 
                     Spacer(modifier = Modifier.height(16.dp))
 

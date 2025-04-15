@@ -3,6 +3,7 @@ package com.moviles.clothingapp.navigation
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -16,6 +17,8 @@ import com.moviles.clothingapp.createPost.ui.CameraScreen
 import com.moviles.clothingapp.createPost.ui.CreatePostScreen
 import com.moviles.clothingapp.post.ui.DetailedPostScreen
 import com.moviles.clothingapp.discover.ui.DiscoverScreen
+import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
+import com.moviles.clothingapp.favoritePosts.ui.FavoritesScreen
 import com.moviles.clothingapp.weatherBanner.ui.WeatherCategoryScreen
 import com.moviles.clothingapp.home.ui.MainScreen
 import com.moviles.clothingapp.login.ui.CreateAccountScreen
@@ -29,6 +32,7 @@ import com.moviles.clothingapp.login.ResetPasswordViewModel
 import com.moviles.clothingapp.weatherBanner.WeatherViewModel
 
 
+
 /* Navigation component called to change between pages
 *   - each page is a composable, here we define the routes to call, and which component it invokes.
 *   - all the other pages must be added below the home screen composable.
@@ -39,7 +43,9 @@ fun AppNavigation(navController: NavHostController,
                   loginViewModel: LoginViewModel,
                   resetPasswordViewModel: ResetPasswordViewModel,
                   weatherViewModel: WeatherViewModel,
-                  cartViewModel: CartViewModel
+                  cartViewModel: CartViewModel,
+                  favoritesViewModel: FavoritesViewModel
+
 ) {
 
     /* Check if user is already logged in and navigate accordingly */
@@ -73,7 +79,8 @@ fun AppNavigation(navController: NavHostController,
         /* Home/Main page. Route: home */
         composable("home") {
             val homeViewModel: HomeViewModel = viewModel()
-            MainScreen(navController, homeViewModel, weatherViewModel)
+            homeViewModel.setContext(LocalContext.current)
+            MainScreen(navController, homeViewModel, weatherViewModel, favoritesViewModel)
 
         }
 
@@ -96,6 +103,8 @@ fun AppNavigation(navController: NavHostController,
             DiscoverScreen(navController, postViewModel, query)
         }
 
+
+
         composable(
             route = "detailedPost/{postId}",
             arguments = listOf(navArgument("postId") { type = NavType.IntType })
@@ -105,6 +114,7 @@ fun AppNavigation(navController: NavHostController,
             DetailedPostScreen(
                 productId = postId,
                 viewModel = postViewModel,
+                favoritesViewModel,
                 cartViewModel,
                 onBack = { navController.popBackStack() },
                 onNavigateToCart = { navController.navigate("cart")}
@@ -129,6 +139,10 @@ fun AppNavigation(navController: NavHostController,
 
         composable("map/") {
             MapScreen(navController)
+        }
+
+        composable("favorites") {
+            FavoritesScreen(navController, favoritesViewModel)
         }
 
 

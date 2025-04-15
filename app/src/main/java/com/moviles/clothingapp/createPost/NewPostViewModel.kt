@@ -118,7 +118,8 @@ class NewPostViewModel(application: Application) : AndroidViewModel(application)
                     group = selectedGroup.value,
                     price = formattedPrice.value,
                     image = imageUrl,
-                    color = selectedColor.value
+                    color = selectedColor.value,
+                    thumbnail = ""
                 )
 
                 val response = withContext(Dispatchers.IO){

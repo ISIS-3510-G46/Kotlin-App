@@ -1,5 +1,6 @@
 package com.moviles.clothingapp.createPost.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,6 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
@@ -25,7 +27,9 @@ import coil.compose.rememberAsyncImagePainter
 import com.moviles.clothingapp.createPost.NewPostViewModel
 import com.moviles.clothingapp.ui.utils.DarkGreen
 import com.moviles.clothingapp.ui.utils.BottomNavigationBar
+import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
 import com.moviles.clothingapp.ui.utils.figtreeFamily
+import com.moviles.clothingapp.ui.utils.smallNoInternetMessage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -40,6 +44,7 @@ import kotlinx.coroutines.launch
 fun CreatePostScreen(navController: NavController, imageUri: String, viewModel: NewPostViewModel = viewModel()) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     /* Send image to the ViewModel */
     LaunchedEffect(imageUri) {
@@ -85,6 +90,11 @@ fun CreatePostScreen(navController: NavController, imageUri: String, viewModel: 
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(start = 16.dp)
                     )
+                }
+
+                if (!isInternetAvailable(context)) {
+                    Log.d("Status Internet", isInternetAvailable(context).toString())
+                    smallNoInternetMessage()
                 }
 
                 /* Show taken image by user */

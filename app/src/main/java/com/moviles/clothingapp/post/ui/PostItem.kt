@@ -27,11 +27,11 @@ import com.moviles.clothingapp.ui.utils.figtreeFamily
 fun PostItem(post: PostData, onClick: () -> Unit) {
     val bucketId = BuildConfig.BUCKET_ID
     val projectId = "moviles"
-    val imageUrl = remember(post.image) {
-        if (post.image.startsWith("http")) { // If seeder image is in URL if not in bucket
-            post.image
+    val imageUrl = remember(post.thumbnail) {
+        if (post.thumbnail.startsWith("http")) { // If seeder image is in URL if not in bucket
+            post.thumbnail
         } else {
-            "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${post.image}/view?project=$projectId"
+            "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${post.thumbnail}/view?project=$projectId"
         }
     }
 

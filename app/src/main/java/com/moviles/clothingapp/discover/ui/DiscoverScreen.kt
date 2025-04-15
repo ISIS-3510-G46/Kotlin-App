@@ -104,7 +104,8 @@ fun DiscoverScreen(navController: NavController, viewModel: PostViewModel, query
                 onSearchTextChange = { searchQuery = it },
                 onSearchSubmit = {
                     navController.navigate("discover/${searchQuery}")
-                }
+                },
+                navController
             )
 
             val filteredPosts = posts.filter { post ->

@@ -105,9 +105,10 @@ fun FilterDialog(
                         val colors = mapOf(
                             "Negro" to Color.Black,
                             "Rojo" to Color.Red,
-                            "Gris" to Color.Gray,
+                            "Blanco" to Color.White,
                             "Yellow" to Color.Yellow,
-                            "Azul" to Color.Blue
+                            "Azul" to Color.Blue,
+                            "Verde" to Color.Green
                         )
 
                         colors.forEach { (name, color) ->
