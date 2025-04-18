@@ -10,11 +10,14 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.RemoveCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,9 +26,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.moviles.clothingapp.BuildConfig
+import com.moviles.clothingapp.R
 import com.moviles.clothingapp.cart.data.CartItemData
 import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.ui.utils.BottomNavigationBar
+import com.moviles.clothingapp.ui.utils.CoilProvider
 import com.moviles.clothingapp.ui.utils.DarkGreen
 
 @Composable
@@ -144,6 +149,11 @@ fun CartItemCard(
     onRemove: () -> Unit,
     navController: NavController
 ) {
+
+    val context = LocalContext.current
+    val imageLoader = remember(context) {       // ② recuerdas sólo si cambia el ctx
+        CoilProvider.get(context)
+    }
     val product = cartItem.product
     val bucketId = BuildConfig.BUCKET_ID
     val projectId = "moviles"
@@ -170,12 +180,16 @@ fun CartItemCard(
             // Product image
             AsyncImage(
                 model = imageUrl,
+                imageLoader = imageLoader,
+                placeholder = painterResource(R.drawable.placeholder),
+                error       = painterResource(R.drawable.image_error),
                 contentDescription = product.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp))
             )
+
 
             Spacer(modifier = Modifier.width(16.dp))
 

@@ -10,11 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.moviles.clothingapp.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import com.moviles.clothingapp.BuildConfig
 import com.moviles.clothingapp.post.data.PostData
+import com.moviles.clothingapp.ui.utils.CoilProvider
 import com.moviles.clothingapp.ui.utils.figtreeFamily
 
 
@@ -25,6 +29,12 @@ import com.moviles.clothingapp.ui.utils.figtreeFamily
  */
 @Composable
 fun PostItem(post: PostData, onClick: () -> Unit) {
+
+    val context = LocalContext.current
+    val imageLoader = remember(context) {       // ② recuerdas sólo si cambia el ctx
+        CoilProvider.get(context)
+    }
+
     val bucketId = BuildConfig.BUCKET_ID
     val projectId = "moviles"
     val imageUrl = remember(post.thumbnail) {
@@ -48,6 +58,9 @@ fun PostItem(post: PostData, onClick: () -> Unit) {
             AsyncImage(
                 model = imageUrl,
                 contentDescription = post.name,
+                imageLoader = imageLoader,
+                placeholder = painterResource(R.drawable.placeholder),
+                error       = painterResource(R.drawable.image_error),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()
