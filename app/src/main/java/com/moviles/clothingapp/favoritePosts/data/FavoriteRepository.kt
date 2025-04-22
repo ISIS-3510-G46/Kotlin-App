@@ -6,9 +6,9 @@ class FavoriteRepository {
 
     private val apiService = RetrofitInstance.apiService
 
-    private suspend fun sendFavoriteToBackend(brand: String) {
+    private suspend fun sendFavoriteToBackend(brand: String, latitude: Double?, longitude: Double?) {
         try {
-            val brandCount = BrandCount(brand, count = 1)
+            val brandCount = BrandCount(brand, count = 1, latitude, longitude)
 
             val response = apiService.addFavorite(brandCount)
             if (response.isSuccessful) {
@@ -21,7 +21,7 @@ class FavoriteRepository {
         }
     }
 
-    suspend fun addFavoriteBrand(brand: String) {
-        sendFavoriteToBackend(brand)
+    suspend fun addFavoriteBrand(brand: String, latitude: Double?, longitude: Double?) {
+        sendFavoriteToBackend(brand, latitude, longitude)
     }
 }

@@ -9,6 +9,7 @@ import com.moviles.clothingapp.data.RoomDB.Companion.getDatabase
 import com.moviles.clothingapp.favoritePosts.data.BrandCount
 import com.moviles.clothingapp.favoritePosts.data.FavoriteEntity
 import com.moviles.clothingapp.post.data.PostData
+import com.moviles.clothingapp.weatherBanner.data.WeatherRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,10 +64,17 @@ class FavoritesViewModel : ViewModel() {
         val database = getDatabase(context)
         val favoriteDao = database.favoriteDao()
 
-        viewModelScope.launch (Dispatchers.Main) {
-            favoriteRepository.addFavoriteBrand(post.brand)
-            val isFavorite = post.id?.let { favoriteDao.isFavoriteByPostId(it) }
+        val weatherRepository = WeatherRepository(context)
 
+        viewModelScope.launch(Dispatchers.Main) {
+            val location = weatherRepository.getCurrentLocation()
+            val latitude = location?.latitude
+            val longitude = location?.longitude
+
+            favoriteRepository.addFavoriteBrand(post.brand, latitude, longitude)
+
+
+            val isFavorite = post.id?.let { favoriteDao.isFavoriteByPostId(it) }
             if (isFavorite == true) {
                 favoriteDao.deleteFavoriteByPostId(post.id)
             } else {

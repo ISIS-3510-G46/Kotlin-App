@@ -30,5 +30,8 @@ interface FavoriteDao {
 data class BrandCount(
 
     @Json(name="brand") val brand: String,
-    @Json(name="count") val count: Int
+    @Json(name="count") val count: Int,
+    @Json(name="latitude") val latitude: Double?,
+    @Json(name="longitude") val longitude: Double?
+
 )
