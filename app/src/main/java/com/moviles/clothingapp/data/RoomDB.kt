@@ -5,12 +5,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.moviles.clothingapp.cart.data.CartItemDao
+import com.moviles.clothingapp.cart.data.CartItemEntity
 import com.moviles.clothingapp.favoritePosts.data.FavoriteDao
 import com.moviles.clothingapp.favoritePosts.data.FavoriteEntity
 
-@Database(entities = [FavoriteEntity::class], version = 1, exportSchema = false)
+@Database(entities = [FavoriteEntity::class, CartItemEntity::class], version = 1, exportSchema = false)
 abstract class RoomDB : RoomDatabase() {
     abstract fun favoriteDao(): FavoriteDao
+    abstract fun cartItemDao(): CartItemDao
 
     companion object {
         @Volatile
@@ -21,7 +24,7 @@ abstract class RoomDB : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     RoomDB::class.java,
-                    "favorites_database"
+                    "app_database"
                 ).build()
                 INSTANCE = instance
                 instance

@@ -248,7 +248,7 @@ fun DetailedPostScreen(
                         onClick = {
                             product?.let {
                                 Log.d("DetailedPostScreen", "Adding product to cart: ${it.name}, ID: ${it.id}, Price: ${it.price}")
-                                cartViewModel.addToCart(it)
+                                cartViewModel.addToCart(context, it)
                                 Toast.makeText(context, "Producto añadido al carrito", Toast.LENGTH_SHORT).show()
                                 onNavigateToCart()
                             }
