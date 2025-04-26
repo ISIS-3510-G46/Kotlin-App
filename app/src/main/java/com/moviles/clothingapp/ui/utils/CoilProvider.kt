@@ -4,9 +4,11 @@ import android.content.Context
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import coil.util.DebugLogger
 
 object CoilProvider {
     fun get(ctx: Context) = ImageLoader.Builder(ctx)
+        //.logger(DebugLogger()) // Comentar en el caso de modo no DEBUG
         .memoryCache { MemoryCache.Builder(ctx).maxSizePercent(0.20).build() }
         .diskCache {
             DiskCache.Builder()

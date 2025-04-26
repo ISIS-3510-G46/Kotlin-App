@@ -76,7 +76,7 @@ fun DetailedPostScreen(
         }
 
         product != null -> {
-            val imageLoader = remember(context) {       // ② recuerdas sólo si cambia el ctx
+            val imageLoader = remember(context) {
                 CoilProvider.get(context)
             }
             val bucketId = BuildConfig.BUCKET_ID

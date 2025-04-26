@@ -151,7 +151,7 @@ fun CartItemCard(
 ) {
 
     val context = LocalContext.current
-    val imageLoader = remember(context) {       // ② recuerdas sólo si cambia el ctx
+    val imageLoader = remember(context) {
         CoilProvider.get(context)
     }
     val product = cartItem.product
