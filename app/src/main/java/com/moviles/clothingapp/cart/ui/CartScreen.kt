@@ -3,7 +3,6 @@ package com.moviles.clothingapp.cart.ui
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -23,7 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.moviles.clothingapp.BuildConfig
-import com.moviles.clothingapp.cart.data.CartItemData
+import com.moviles.clothingapp.cart.data.CartItemEntity
 import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.ui.utils.BottomNavigationBar
 import com.moviles.clothingapp.ui.utils.DarkGreen
@@ -140,7 +139,7 @@ fun CartScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartItemCard(
-    cartItem: CartItemData,
+    cartItem: CartItemEntity,
     onRemove: () -> Unit,
     navController: NavController
 ) {
