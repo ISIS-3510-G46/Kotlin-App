@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import androidx.compose.ui.res.painterResource
+import com.moviles.clothingapp.R
 import com.moviles.clothingapp.BuildConfig
 import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.cart.data.CartItemEntity
@@ -159,6 +162,10 @@ fun CartItemCard(
     onRemove: () -> Unit,
     navController: NavController
 ) {
+    val context = LocalContext.current
+    val imageLoader = remember(context) {
+        CoilProvider.get(context)
+    }
     val product =  PostData(
         id = cartItem.postId,
         name = cartItem.name,
