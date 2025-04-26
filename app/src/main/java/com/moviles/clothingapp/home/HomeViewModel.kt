@@ -3,7 +3,7 @@ package com.moviles.clothingapp.home
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
-import com.moviles.clothingapp.data.cache.RecentProductsCache
+import com.moviles.clothingapp.home.data.cache.RecentProductsCache
 import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.post.data.PostRepository
