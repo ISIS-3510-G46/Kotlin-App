@@ -25,7 +25,6 @@ import com.moviles.clothingapp.R
 import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import com.moviles.clothingapp.home.HomeViewModel
 import com.moviles.clothingapp.ui.utils.BottomNavigationBar
-import com.moviles.clothingapp.ui.utils.QuickActions
 import com.moviles.clothingapp.ui.utils.SearchBar
 import com.moviles.clothingapp.weatherBanner.WeatherViewModel
 import com.moviles.clothingapp.weatherBanner.ui.PromoBanner
@@ -117,7 +116,7 @@ fun MainScreen(
                 //item { QuickActions() } d
                 item { PromoBanner(bannerType = banner.value, navController = navController) }
                 item { CategorySection(categoryList = categoryList, navController = navController) }
-                item { FeaturedProducts(navController = navController, homeViewModel) }
+                item { FeaturedProducts(navController = navController) }
 
             }
         }

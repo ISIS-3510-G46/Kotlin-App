@@ -28,10 +28,13 @@ import coil.compose.AsyncImage
 import androidx.compose.ui.res.painterResource
 import com.moviles.clothingapp.R
 import com.moviles.clothingapp.BuildConfig
+import com.moviles.clothingapp.R
+import com.moviles.clothingapp.cart.data.CartItemData
 import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.cart.data.CartItemEntity
 import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.ui.utils.BottomNavigationBar
+import com.moviles.clothingapp.ui.utils.CoilProvider
 import com.moviles.clothingapp.ui.utils.DarkGreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -162,6 +165,7 @@ fun CartItemCard(
     onRemove: () -> Unit,
     navController: NavController
 ) {
+
     val context = LocalContext.current
     val imageLoader = remember(context) {
         CoilProvider.get(context)
@@ -203,12 +207,16 @@ fun CartItemCard(
             // Product image
             AsyncImage(
                 model = imageUrl,
+                imageLoader = imageLoader,
+                placeholder = painterResource(R.drawable.placeholder),
+                error       = painterResource(R.drawable.image_error),
                 contentDescription = product.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp))
             )
+
 
             Spacer(modifier = Modifier.width(16.dp))
 
