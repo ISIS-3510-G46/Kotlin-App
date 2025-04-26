@@ -2,6 +2,7 @@ package com.moviles.clothingapp.post.data
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import com.moviles.clothingapp.discover.ui.data.FilterUsageDto
 import com.moviles.clothingapp.favoritePosts.data.BrandCount
 import com.moviles.clothingapp.ui.utils.RetrofitInstance
 import com.squareup.moshi.Moshi
@@ -134,5 +135,8 @@ class PostRepository(/*private val postDao: PostDao*/) {
 
         @POST("favorites/add")
         suspend fun addFavorite(@Body brandCount: BrandCount): Response<Any>
+
+        @POST("filter_usage")
+        suspend fun addFilterUsage(@Body body: FilterUsageDto): Response<Unit>
     }
 }
