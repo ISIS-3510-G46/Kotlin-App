@@ -28,8 +28,6 @@ import coil.compose.AsyncImage
 import androidx.compose.ui.res.painterResource
 import com.moviles.clothingapp.R
 import com.moviles.clothingapp.BuildConfig
-import com.moviles.clothingapp.R
-import com.moviles.clothingapp.cart.data.CartItemData
 import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.cart.data.CartItemEntity
 import com.moviles.clothingapp.post.data.PostData
@@ -158,7 +156,7 @@ fun CartScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun CartItemCard(
     cartItem: CartItemEntity,
