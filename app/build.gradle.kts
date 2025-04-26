@@ -61,7 +61,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.03.00"))
 
     // Coil (Image Loading for Compose)
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     // Added for this project compose UI, icons, nav and fonts
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")

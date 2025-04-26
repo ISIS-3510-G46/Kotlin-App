@@ -1,7 +1,6 @@
 package com.moviles.clothingapp.home.ui
 
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -9,31 +8,27 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.moviles.clothingapp.home.HomeViewModel
+import com.moviles.clothingapp.data.cache.RecentProductsCache
 import com.moviles.clothingapp.post.ui.PostItem
-import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
 import com.moviles.clothingapp.ui.utils.NoInternetMessage
 import com.moviles.clothingapp.ui.utils.dmSansFamily
 
 
 /* SECCION DESTACADOS */
 @Composable
-fun FeaturedProducts(navController: NavController, viewModel: HomeViewModel) {
-    val allProducts by viewModel.postData.observeAsState(emptyList())
-    val products = allProducts.takeLast(6)
-    val context = LocalContext.current
+fun FeaturedProducts(navController: NavController) {
+    val featured by RecentProductsCache.flow.collectAsState()
 
-    LaunchedEffect(allProducts.size) {
-        Log.d("FeaturedProducts", "Products updated, size: ${allProducts.size}")
+    LaunchedEffect(Unit) {
+        RecentProductsCache.load()
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -52,10 +47,8 @@ fun FeaturedProducts(navController: NavController, viewModel: HomeViewModel) {
             )
         }
 
-        if (!isInternetAvailable(context)) { //TODO: Add that also IF there is nothing in CACHE.
-            Log.d("Status Internet", isInternetAvailable(context).toString())
-            NoInternetMessage()
-        }
+        if (featured.isEmpty()) {
+            NoInternetMessage()}
 
         // Wrap in a Box with height to avoid infinite scrolling error
         Box(modifier = Modifier
@@ -66,7 +59,7 @@ fun FeaturedProducts(navController: NavController, viewModel: HomeViewModel) {
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(products) { product ->
+                items(featured) { product ->
                     PostItem(product) {
                         navController.navigate("detailedPost/${product.id}")
                     }
