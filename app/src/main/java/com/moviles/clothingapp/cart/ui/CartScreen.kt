@@ -9,31 +9,46 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.RemoveCircle
 import androidx.compose.material3.*
-import androidx.compose.material3.BottomSheetDefaults.ContainerColor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.moviles.clothingapp.cart.data.CartItemData
+import androidx.compose.ui.res.painterResource
+import com.moviles.clothingapp.R
+import com.moviles.clothingapp.BuildConfig
 import com.moviles.clothingapp.cart.CartViewModel
+import com.moviles.clothingapp.cart.data.CartItemEntity
+import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.ui.utils.BottomNavigationBar
+import com.moviles.clothingapp.ui.utils.CoilProvider
 import com.moviles.clothingapp.ui.utils.DarkGreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 @Composable
 fun CartScreen(
     navController: NavController,
-    cartViewModel: CartViewModel = viewModel()
+    cartViewModel: CartViewModel
 ) {
-
+    val cartItems by cartViewModel.cartItems.collectAsState()
+    val context = LocalContext.current
+    val scope = CoroutineScope(
+        Dispatchers.Main + Job()
+    )
     Log.d("CART", "${cartViewModel.cartItems}")
 
     Scaffold(
@@ -52,7 +67,7 @@ fun CartScreen(
                 modifier = Modifier.padding(16.dp)
             )
 
-            if (cartViewModel.cartItems.isEmpty()) {
+            if (cartItems.isEmpty()) {
                 // Empty cart view
                 Box(
                     modifier = Modifier
@@ -65,7 +80,7 @@ fun CartScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "Empty Cart",
+                            contentDescription = "Carrito vacío",
                             modifier = Modifier.size(100.dp),
                             tint = Color.LightGray
                         )
@@ -100,19 +115,24 @@ fun CartScreen(
                         .weight(1f)
                         .fillMaxWidth()
                 ) {
-                    items(cartViewModel.cartItems) { cartItem ->
+                    items(cartItems) { cartItem ->
+
+                        //Convert to PostData
+                        val post = cartItem
+
                         CartItemCard(
-                            cartItem = cartItem,
+                            cartItem = post,
                             onRemove = {
-                                val productId = cartItem.product.id
+                                val productId = post.id
                                 try {
                                     if (productId != null) {
-                                        cartViewModel.removeFromCart(productId)
+                                        scope.launch{cartViewModel.removeFromCart(context, productId.toString())}
                                     }
                                 } catch (e: Exception) {
                                     Log.e("CartScreen", "Failed to del item: $productId", e)
                                 }
-                            }
+                            },
+                            navController
                         )
                     }
                 }
@@ -136,14 +156,31 @@ fun CartScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun CartItemCard(
-    cartItem: CartItemData,
-    onRemove: () -> Unit
+    cartItem: CartItemEntity,
+    onRemove: () -> Unit,
+    navController: NavController
 ) {
-    val product = cartItem.product
-    val bucketId = "67ddf3860035ee6bd725"
+
+    val context = LocalContext.current
+    val imageLoader = remember(context) {
+        CoilProvider.get(context)
+    }
+    val product =  PostData(
+        id = cartItem.postId,
+        name = cartItem.name,
+        price = cartItem.price,
+        size = cartItem.size,
+        brand = cartItem.brand,
+        image = cartItem.imageUrl,
+        category = cartItem.category,
+        color = cartItem.color,
+        group = cartItem.group,
+        thumbnail = cartItem.thumbnail
+    )
+    val bucketId = BuildConfig.BUCKET_ID
     val projectId = "moviles"
     val imageUrl = if (product.image.startsWith("http")) {
         product.image
@@ -156,7 +193,8 @@ fun CartItemCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        onClick = { navController.navigate("detailedPost/${product.id}") }
     ) {
         Row(
             modifier = Modifier
@@ -167,12 +205,16 @@ fun CartItemCard(
             // Product image
             AsyncImage(
                 model = imageUrl,
+                imageLoader = imageLoader,
+                placeholder = painterResource(R.drawable.placeholder),
+                error       = painterResource(R.drawable.image_error),
                 contentDescription = product.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp))
             )
+
 
             Spacer(modifier = Modifier.width(16.dp))
 

@@ -5,33 +5,31 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import com.moviles.clothingapp.home.HomeViewModel
+import com.moviles.clothingapp.home.data.cache.RecentProductsCache
 import com.moviles.clothingapp.post.ui.PostItem
+import com.moviles.clothingapp.ui.utils.NoInternetMessage
 import com.moviles.clothingapp.ui.utils.dmSansFamily
-import com.moviles.clothingapp.ui.utils.figtreeFamily
 
 
 /* SECCION DESTACADOS */
 @Composable
-fun FeaturedProducts(navController: NavController, viewModel: HomeViewModel) {
-    val allProducts by viewModel.postData.observeAsState(emptyList())
-    val products = allProducts.takeLast(6)
+fun FeaturedProducts(navController: NavController) {
+    val featured by RecentProductsCache.flow.collectAsState()
+
+    LaunchedEffect(Unit) {
+        RecentProductsCache.load()
+    }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
@@ -49,6 +47,9 @@ fun FeaturedProducts(navController: NavController, viewModel: HomeViewModel) {
             )
         }
 
+        if (featured.isEmpty()) {
+            NoInternetMessage()}
+
         // Wrap in a Box with height to avoid infinite scrolling error
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -58,7 +59,7 @@ fun FeaturedProducts(navController: NavController, viewModel: HomeViewModel) {
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(products) { product ->
+                items(featured) { product ->
                     PostItem(product) {
                         navController.navigate("detailedPost/${product.id}")
                     }

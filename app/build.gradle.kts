@@ -6,6 +6,7 @@ plugins {
     id("com.google.firebase.firebase-perf")
     id("com.google.gms.google-services")
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("com.google.devtools.ksp")
 }
 
 
@@ -19,8 +20,9 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "OPEN_WEATHER_API_KEY", "\"${project.findProperty("OPEN_WEATHER_API_KEY")}\"")
+        buildConfigField ("String", "BUCKET_ID", "\"${project.findProperty("STORAGE_ID")}\"")
     }
 
     buildTypes {
@@ -41,11 +43,10 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-
-    buildFeatures {
+        buildConfig = true
         viewBinding = true
     }
+
 }
 
 dependencies {
@@ -60,7 +61,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.03.00"))
 
     // Coil (Image Loading for Compose)
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     // Added for this project compose UI, icons, nav and fonts
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
@@ -90,6 +91,14 @@ dependencies {
 
     // Image Storage
     implementation("io.appwrite:sdk-for-android:6.1.0")
+
+    // ROOM
+    implementation ("androidx.room:room-runtime:2.6.1")
+    implementation ("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.5.0")
+
+    // Swipe refresh
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.27.0")
 
 
 

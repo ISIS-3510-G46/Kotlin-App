@@ -2,6 +2,9 @@ package com.moviles.clothingapp.post.data
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import com.moviles.clothingapp.discover.ui.data.FilterUsageDto
+import com.moviles.clothingapp.favoritePosts.data.BrandCount
+import com.moviles.clothingapp.ui.utils.RetrofitInstance
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Response
@@ -12,16 +15,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 class PostRepository(/*private val postDao: PostDao*/) {
-
-    private val BASE_URL = "http://10.0.2.2:8000/" // this URL of localhost since we run in emulator
-
-    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .build()
-
-    private val apiService: ApiService = retrofit.create(ApiService::class.java)
+    private val apiService = RetrofitInstance.apiService
 
     /* Get all posts from local database TODO: Connect this with ROM or something for cache maybe?
     fun getPosts(): LiveData<List<PostData>> {
@@ -46,7 +40,7 @@ class PostRepository(/*private val postDao: PostDao*/) {
     }
 
 
-    // Fetch products by category
+    /* Fetch products by category */
     suspend fun fetchPostsFiltered(): List<PostData>? {
         return try {
             val response = apiService.fetchClothesFiltered()
@@ -138,5 +132,11 @@ class PostRepository(/*private val postDao: PostDao*/) {
 
         @GET("clothing/{id}")
         suspend fun fetchClothesById(@retrofit2.http.Path("id") id: Int): Response<PostData>
+
+        @POST("favorites/add")
+        suspend fun addFavorite(@Body brandCount: BrandCount): Response<Any>
+
+        @POST("filter_usage")
+        suspend fun addFilterUsage(@Body body: FilterUsageDto): Response<Unit>
     }
 }

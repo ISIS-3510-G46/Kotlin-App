@@ -1,5 +1,6 @@
 package com.moviles.clothingapp.weatherBanner.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -10,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -17,8 +19,12 @@ import androidx.navigation.NavController
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.Trace
 import com.moviles.clothingapp.ui.utils.DarkGreen
-import com.moviles.clothingapp.post.PostViewModel
+import com.moviles.clothingapp.weatherBanner.WeatherViewModel
 import com.moviles.clothingapp.post.ui.PostItem
+import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
+import com.moviles.clothingapp.ui.utils.NoInternetMessage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 /* Screen to see after clicking the home's promoBanner:
@@ -27,22 +33,20 @@ import com.moviles.clothingapp.post.ui.PostItem
 *   - TODO: link each post to its detailed page.
 */
 @Composable
-fun WeatherCategoryScreen(categoryId: String, navController: NavController, viewModel: PostViewModel) {
+fun WeatherCategoryScreen(categoryId: String, navController: NavController, viewModel: WeatherViewModel) {
     val trace: Trace = FirebasePerformance.getInstance().newTrace("WeatherClothesScreen_trace")
-    trace.start()
+    val context = LocalContext.current
+
     /* Launch the query for category of weather */
     LaunchedEffect(categoryId) {
+        trace.start()
         viewModel.fetchPostsByCategory(categoryId)
     }
 
     val posts by viewModel.posts.collectAsState()
-
-    LaunchedEffect(posts) {
-        if (posts.isNotEmpty()) {
-            trace.stop()
-        }
+    if (posts.isNotEmpty()){
+        trace.stop()
     }
-
 
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -61,6 +65,11 @@ fun WeatherCategoryScreen(categoryId: String, navController: NavController, view
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp)
             )
+        }
+
+        if (!isInternetAvailable(context)) {
+            Log.d("Status Internet", isInternetAvailable(context).toString())
+            NoInternetMessage()
         }
 
         /* Display loading or posts */

@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.post.data.PostRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PostViewModel : ViewModel() {
     private val repository = PostRepository()
@@ -22,56 +24,52 @@ class PostViewModel : ViewModel() {
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
     private val _imageUrl = MutableStateFlow<String?>(null)
-    val imageUrl: StateFlow<String?> get() = _imageUrl
 
     init {
         fetchPostsFiltered()
     }
 
     private fun fetchPostsFiltered() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {  /* Get data with IO thread pool */
             val result = repository.fetchPostsFiltered() // Ensure repository is returning data
-            _posts.value = result ?: emptyList()
-        }
-    }
-
-
-    /* Fetch products by category (weather) */
-    fun fetchPostsByCategory(categoryId: String) {
-        viewModelScope.launch {
-            try {
-                val result = repository.fetchPostsByCategory(categoryId)
+            withContext(Dispatchers.Main) {
                 _posts.value = result ?: emptyList()
-            } catch (e: Exception) {
-                Log.e("PostViewModel", "Error fetching category $categoryId: ${e.message}")
-                _posts.value = emptyList()
             }
         }
     }
 
+
     /* Fetch post by ID */
     fun fetchPostById(id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO){
             _isLoading.value = true
             try {
                 val result = repository.fetchPostById(id)
-                _post.value = result
-                result?.image?.let { fetchImageUrl(it) }
-
+                withContext(Dispatchers.Main) {
+                    _post.value = result
+                    result?.image?.let { fetchImageUrl(it) }
+                }
             } catch (e: Exception) {
                 Log.e("PostViewModel", "Error fetching post by ID $id: ${e.message}")
-                _post.value = null
+                withContext(Dispatchers.Main) {
+                    _post.value = null
+                }
             } finally {
-                _isLoading.value = false
+                withContext(Dispatchers.Main) {
+                    _isLoading.value = false
+                }
             }
         }
     }
 
     fun fetchImageUrl(fileId: String) {
-        val projectId = "moviles"
-        val bucketId = "67ddf3860035ee6bd725"
-        val url = "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/$fileId/view?project=$projectId"
-        _imageUrl.value = url
+        viewModelScope.launch(Dispatchers.Default) {
+            val projectId = "moviles"
+            val bucketId = "67ddf3860035ee6bd725"
+            val url =
+                "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/$fileId/view?project=$projectId"
+            _imageUrl.value = url
+        }
     }
 }
 

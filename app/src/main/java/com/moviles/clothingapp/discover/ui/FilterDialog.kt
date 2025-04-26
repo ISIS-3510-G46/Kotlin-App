@@ -19,7 +19,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.moviles.clothingapp.ui.utils.DarkGreen
 import com.moviles.clothingapp.ui.utils.figtreeFamily
-
+import FilterRepository
+import com.moviles.clothingapp.weatherBanner.data.WeatherRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 
 
 /* Filter dialog pop-up:
@@ -34,7 +40,7 @@ import com.moviles.clothingapp.ui.utils.figtreeFamily
 * */
 @Composable
 fun FilterDialog(
-    onDismiss: () -> Unit,
+    onDismiss: () -> Unit, // Unit = void (returns void)
     selectedColor: String,
     onColorChange: (String) -> Unit,
     selectedSize: String,
@@ -46,8 +52,10 @@ fun FilterDialog(
     maxPrice: String,
     onMaxPriceChange: (String) -> Unit
 ) {
-
-
+    val ctx     = LocalContext.current
+    val scope         = rememberCoroutineScope()
+    val weatherRepo   = remember { WeatherRepository(ctx) }
+    val filterRepo    = remember { FilterRepository() }
     /* Convert min/max prices (removing commas) as we store data as "20,000" COP */
     val minPriceValue = minPrice.replace(",", "").toFloatOrNull() ?: 0f
     val maxPriceValue = maxPrice.replace(",", "").toFloatOrNull() ?: 200000f // 200,000 COP
@@ -105,9 +113,10 @@ fun FilterDialog(
                         val colors = mapOf(
                             "Negro" to Color.Black,
                             "Rojo" to Color.Red,
-                            "Gris" to Color.Gray,
+                            "Blanco" to Color.White,
                             "Yellow" to Color.Yellow,
-                            "Azul" to Color.Blue
+                            "Azul" to Color.Blue,
+                            "Verde" to Color.Green
                         )
 
                         colors.forEach { (name, color) ->
@@ -186,7 +195,27 @@ fun FilterDialog(
         /* Confirm filters button */
         confirmButton = {
             Button(
-                onClick = onDismiss,
+                onClick = {
+                    val first = when {
+                        selectedColor.isNotBlank()  -> "color" to selectedColor
+                        selectedSize.isNotBlank()   -> "size"  to selectedSize
+                        selectedGroup.isNotBlank() && selectedGroup!="Todos" ->
+                            "group" to selectedGroup
+                        minPrice != "0" || maxPrice != "0" ->
+                            "price" to "$minPrice-$maxPrice"
+                        else -> null
+                    }
+                    if (first != null) {
+                        scope.launch(Dispatchers.IO) {
+                            val loc = weatherRepo.getCurrentLocation()
+                            filterRepo.send(
+                                first.first, first.second,
+                                loc?.latitude, loc?.longitude
+                            )
+                        }
+                    }
+                    onDismiss()
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = DarkGreen)
@@ -194,6 +223,7 @@ fun FilterDialog(
                 Text("Aplicar Filtros")
             }
         }
+
     )
 }
 

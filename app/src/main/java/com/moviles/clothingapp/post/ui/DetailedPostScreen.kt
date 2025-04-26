@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.ShoppingCart
@@ -26,11 +27,17 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.moviles.clothingapp.BuildConfig
+import com.moviles.clothingapp.R
 import com.moviles.clothingapp.cart.CartViewModel
+import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import com.moviles.clothingapp.post.PostViewModel
+import com.moviles.clothingapp.ui.utils.CoilProvider
 import com.moviles.clothingapp.ui.utils.DarkGreen
 import com.moviles.clothingapp.ui.utils.Red
 
@@ -38,16 +45,27 @@ import com.moviles.clothingapp.ui.utils.Red
 fun DetailedPostScreen(
     productId: Int,
     viewModel: PostViewModel = viewModel(),
+    favoritesViewModel: FavoritesViewModel,
     cartViewModel: CartViewModel,
     onBack: () -> Unit,
     onNavigateToCart: () -> Unit
 ) {
-    val product by viewModel.post.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val product by viewModel.post.collectAsStateWithLifecycle()
+    val isFavorite = remember(product) {
+        mutableStateOf(false)
+    }
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(productId) {
         viewModel.fetchPostById(productId)
+    }
+
+    LaunchedEffect(product) {
+        product?.id?.let { postId ->
+            val isProductFavorite = favoritesViewModel.isFavorite(context, postId)
+            isFavorite.value = isProductFavorite
+        }
     }
 
     when {
@@ -58,12 +76,17 @@ fun DetailedPostScreen(
         }
 
         product != null -> {
-            val bucketId = "67ddf3860035ee6bd725"
+            val imageLoader = remember(context) {
+                CoilProvider.get(context)
+            }
+            val bucketId = BuildConfig.BUCKET_ID
             val projectId = "moviles"
-            val imageUrl = if (product!!.image.startsWith("http")) {
-                product!!.image
-            } else {
-                "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${product!!.image}/view?project=$projectId"
+            val imageUrl = remember(product!!.image) {
+                if (product!!.image.startsWith("http")) {
+                    product!!.image
+                } else {
+                    "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${product!!.image}/view?project=$projectId"
+                }
             }
 
 
@@ -83,6 +106,9 @@ fun DetailedPostScreen(
                     AsyncImage(
                         model = imageUrl,
                         contentDescription = product!!.name,
+                        imageLoader = imageLoader,
+                        placeholder = painterResource(R.drawable.placeholder),
+                        error       = painterResource(R.drawable.image_error),
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .fillMaxSize()
@@ -105,9 +131,13 @@ fun DetailedPostScreen(
                         )
                     }
 
-                    // Favorite button
                     IconButton(
-                        onClick = { /* Add favorite functionality */ },
+                        onClick = {
+                            product?.id.let { postId ->
+                                isFavorite.value = !isFavorite.value
+                                favoritesViewModel.newFavorite(context, product!!)
+                            }
+                        },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(16.dp)
@@ -115,12 +145,17 @@ fun DetailedPostScreen(
                             .background(Color.White, CircleShape)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.FavoriteBorder,
+                            imageVector = if (isFavorite.value)
+                                Icons.Rounded.Favorite
+                            else
+                                Icons.Default.FavoriteBorder,
                             contentDescription = "Favorite",
                             tint = Color.Black
                         )
                     }
+
                 }
+
 
                 // Product details
                 Column(
@@ -213,7 +248,7 @@ fun DetailedPostScreen(
                         onClick = {
                             product?.let {
                                 Log.d("DetailedPostScreen", "Adding product to cart: ${it.name}, ID: ${it.id}, Price: ${it.price}")
-                                cartViewModel.addToCart(it)
+                                cartViewModel.addToCart(context, it)
                                 Toast.makeText(context, "Producto añadido al carrito", Toast.LENGTH_SHORT).show()
                                 onNavigateToCart()
                             }

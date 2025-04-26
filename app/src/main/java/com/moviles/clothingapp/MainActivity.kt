@@ -18,19 +18,26 @@ import android.os.Build
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.perf.FirebasePerformance
 import com.moviles.clothingapp.cart.CartViewModel
+import com.moviles.clothingapp.home.data.cache.RecentProductsCache
+import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /* The mainActivity initializes all the app */
 class MainActivity : ComponentActivity() {
-    private lateinit var auth: FirebaseAuth
-    private lateinit var loginViewModel: LoginViewModel
-    private lateinit var resetPasswordViewModel: ResetPasswordViewModel
-    private lateinit var weatherViewModel: WeatherViewModel
-    private lateinit var firebaseAnalytics: FirebaseAnalytics
-    private var locationPermissionGranted = false
+    private lateinit var auth: FirebaseAuth // Initializes when onCreate
+    private lateinit var firebaseAnalytics: FirebaseAnalytics // Initializes when onCreate
+    private val cartViewModel: CartViewModel by viewModels()
+    private val loginViewModel by lazy { LoginViewModel(Firebase.auth) }
+    private val resetPasswordViewModel by lazy { ResetPasswordViewModel(Firebase.auth) }
+    private val weatherViewModel by lazy { WeatherViewModel(this, false) }
+    private val favoritesViewModel: FavoritesViewModel by viewModels()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,41 +47,32 @@ class MainActivity : ComponentActivity() {
         auth = Firebase.auth
         firebaseAnalytics = Firebase.analytics
 
-
-        /* Initialize Login ViewModel */
-        loginViewModel = LoginViewModel(auth)
-        resetPasswordViewModel = ResetPasswordViewModel(auth)
-        weatherViewModel = WeatherViewModel(this, hasLocationPermission = false)
-        val cartViewModel: CartViewModel by viewModels()
-
-
-
         setContent {
             val navController = rememberNavController()
-            AppNavigation(navController, loginViewModel, resetPasswordViewModel, weatherViewModel, cartViewModel)
+            AppNavigation(navController, loginViewModel, resetPasswordViewModel, weatherViewModel, cartViewModel, favoritesViewModel)
         }
-
-        /* Log device information and metrics for firebase */
-        logDeviceInfo()
 
         /* Request location permissions */
         requestLocationPermissions()
 
+        /* Log device information and metrics for firebase */
+        logDeviceInfo()
 
     }
 
 
     /* Auxiliary function to record device info in firebase */
     private fun logDeviceInfo() {
-        Log.d("FirebasePerf", "Firebase Performance Monitoring initialized: ${FirebasePerformance.getInstance()}")
-        val deviceInfo = Bundle().apply {
-            putString("device_model", Build.MODEL)
-            putString("device_brand", Build.BRAND)
-            putString("os_version", Build.VERSION.RELEASE)
+        lifecycleScope.launch(Dispatchers.IO) {
+            Log.d("FirebasePerf", "Firebase Performance Monitoring initialized: ${FirebasePerformance.getInstance()}")
+            val deviceInfo = Bundle().apply {
+                putString("device_model", Build.MODEL)
+                putString("device_brand", Build.BRAND)
+                putString("os_version", Build.VERSION.RELEASE)
+            }
+            firebaseAnalytics.logEvent("device_info", deviceInfo)
+            Log.d("DEVICES", deviceInfo.toString())
         }
-
-        firebaseAnalytics.logEvent("device_info", deviceInfo)
-        Log.d("DEVICES", deviceInfo.toString())
     }
 
     /* Auxiliary functions to request location permissions and initialize weatherViewModel to fetch data */
@@ -91,7 +89,6 @@ class MainActivity : ComponentActivity() {
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED -> {
-                // Permissions already granted
                 weatherViewModel.updateLocationPermission(true)
             }
             else -> {
@@ -105,5 +102,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }

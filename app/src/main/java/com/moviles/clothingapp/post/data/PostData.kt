@@ -15,7 +15,8 @@ data class PostData(
     @Json(name="image") val image: String,
     @Json(name="color") val color: String,
     @Json(name="size") val size: String,
-    @Json(name="group") val group: String
+    @Json(name="group") val group: String,
+    @Json(name="thumbnail") val thumbnail: String
 
 )
 
