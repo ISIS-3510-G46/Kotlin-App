@@ -3,36 +3,48 @@ package com.moviles.clothingapp.cart.ui
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.RemoveCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.moviles.clothingapp.BuildConfig
-import com.moviles.clothingapp.cart.data.CartItemEntity
 import com.moviles.clothingapp.cart.CartViewModel
+import com.moviles.clothingapp.cart.data.CartItemEntity
+import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.ui.utils.BottomNavigationBar
 import com.moviles.clothingapp.ui.utils.DarkGreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 @Composable
 fun CartScreen(
     navController: NavController,
-    cartViewModel: CartViewModel = viewModel()
+    cartViewModel: CartViewModel
 ) {
-
+    val cartItems by cartViewModel.cartItems.collectAsState()
+    val context = LocalContext.current
+    val scope = CoroutineScope(
+        Dispatchers.Main + Job()
+    )
     Log.d("CART", "${cartViewModel.cartItems}")
 
     Scaffold(
@@ -51,7 +63,7 @@ fun CartScreen(
                 modifier = Modifier.padding(16.dp)
             )
 
-            if (cartViewModel.cartItems.isEmpty()) {
+            if (cartItems.isEmpty()) {
                 // Empty cart view
                 Box(
                     modifier = Modifier
@@ -99,14 +111,18 @@ fun CartScreen(
                         .weight(1f)
                         .fillMaxWidth()
                 ) {
-                    items(cartViewModel.cartItems) { cartItem ->
+                    items(cartItems) { cartItem ->
+
+                        //Convert to PostData
+                        val post = cartItem
+
                         CartItemCard(
-                            cartItem = cartItem,
+                            cartItem = post,
                             onRemove = {
-                                val productId = cartItem.product.id
+                                val productId = post.id
                                 try {
                                     if (productId != null) {
-                                        cartViewModel.removeFromCart(productId)
+                                        scope.launch{cartViewModel.removeFromCart(context, productId.toString())}
                                     }
                                 } catch (e: Exception) {
                                     Log.e("CartScreen", "Failed to del item: $productId", e)
@@ -143,7 +159,18 @@ fun CartItemCard(
     onRemove: () -> Unit,
     navController: NavController
 ) {
-    val product = cartItem.product
+    val product =  PostData(
+        id = cartItem.postId,
+        name = cartItem.name,
+        price = cartItem.price,
+        size = cartItem.size,
+        brand = cartItem.brand,
+        image = cartItem.imageUrl,
+        category = cartItem.category,
+        color = cartItem.color,
+        group = cartItem.group,
+        thumbnail = cartItem.thumbnail
+    )
     val bucketId = BuildConfig.BUCKET_ID
     val projectId = "moviles"
     val imageUrl = if (product.image.startsWith("http")) {
