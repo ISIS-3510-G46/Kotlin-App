@@ -23,6 +23,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.perf.FirebasePerformance
 import com.moviles.clothingapp.cart.CartViewModel
+import com.moviles.clothingapp.data.cache.RecentProductsCache
 import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -1,7 +1,9 @@
 package com.moviles.clothingapp.home
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.*
+import com.moviles.clothingapp.data.cache.RecentProductsCache
 import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.post.data.PostRepository
@@ -15,6 +17,7 @@ import kotlinx.coroutines.withContext
 *     to send the information of the products to the Categories and FeaturedProducts views.
 */
 class HomeViewModel : ViewModel() {
+    private val _featured = MutableLiveData<List<PostData>>(emptyList())
     private val postRepository = PostRepository()
     private var appContext: Context? = null
     private val favoritesViewModel = FavoritesViewModel()
@@ -44,9 +47,15 @@ class HomeViewModel : ViewModel() {
 
     private fun getPostData() {
         viewModelScope.launch(Dispatchers.IO) {
-            val postResult = postRepository.fetchRepository()
+            val postResult: List<PostData> = postRepository.fetchRepository() ?: emptyList()
+
             withContext(Dispatchers.Main) {
-                _postData.postValue(postResult ?: emptyList())
+                _postData.value = postResult
+                val recent = postResult.takeLast(6)
+                if (recent.isNotEmpty()) {
+                    RecentProductsCache.put(recent)
+                    _featured.postValue(recent)
+                }
             }
         }
     }
@@ -69,7 +78,18 @@ class HomeViewModel : ViewModel() {
                 favoritesViewModel.checkForFavoriteBrandMatch(post)
             }
 
+
+            val recent = postResult.takeLast(6)
+            if (recent.isNotEmpty()) {
+                Log.d("RecentProductsCache", "putting refresh recent.size=${recent.size}")
+                RecentProductsCache.put(recent)
+                _featured.postValue(recent)
+            } else {
+                Log.d("RecentProductsCache", "skip caching empty recent on refresh")
+            }
+
             withContext(Dispatchers.Main) {
+
                 _postData.postValue(postResult)
                 lastKnownPosts = postResult
 
