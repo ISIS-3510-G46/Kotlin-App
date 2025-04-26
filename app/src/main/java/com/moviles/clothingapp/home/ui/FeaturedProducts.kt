@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.moviles.clothingapp.data.cache.RecentProductsCache
+import com.moviles.clothingapp.home.data.cache.RecentProductsCache
 import com.moviles.clothingapp.post.ui.PostItem
 import com.moviles.clothingapp.ui.utils.NoInternetMessage
 import com.moviles.clothingapp.ui.utils.dmSansFamily

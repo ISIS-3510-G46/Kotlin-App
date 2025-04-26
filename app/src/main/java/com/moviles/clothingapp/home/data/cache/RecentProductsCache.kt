@@ -1,4 +1,4 @@
-package com.moviles.clothingapp.data.cache
+package com.moviles.clothingapp.home.data.cache
 
 import androidx.collection.LruCache
 import com.moviles.clothingapp.post.data.PostData
