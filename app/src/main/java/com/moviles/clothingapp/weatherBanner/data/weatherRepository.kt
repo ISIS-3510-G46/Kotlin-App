@@ -68,7 +68,7 @@ class WeatherRepository(private val context: Context) {
         return null
     }
 
-    private suspend fun getCurrentLocation(): android.location.Location? {
+    suspend fun getCurrentLocation(): android.location.Location? {
         if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
