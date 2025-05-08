@@ -1,6 +1,7 @@
 package com.moviles.clothingapp.navigation
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -11,8 +12,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
 import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.cart.ui.CartScreen
+import com.moviles.clothingapp.chat.ui.ChatListScreen
+import com.moviles.clothingapp.chat.ui.ChatScreen
 import com.moviles.clothingapp.createPost.ui.CameraScreen
 import com.moviles.clothingapp.createPost.ui.CreatePostScreen
 import com.moviles.clothingapp.post.ui.DetailedPostScreen
@@ -143,6 +147,21 @@ fun AppNavigation(navController: NavHostController,
 
         composable("favorites") {
             FavoritesScreen(navController, favoritesViewModel)
+        }
+
+        composable("chat") {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            val currentUserId = currentUser?.uid
+            Log.d("ACTUAL_USER", currentUserId.toString())
+            if (currentUserId != null) {
+                ChatListScreen(
+                    currentUserId = currentUserId,
+                    onChatClick = { receiverId ->
+                        navController.navigate("chat/$receiverId")
+                    },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
         }
 
 

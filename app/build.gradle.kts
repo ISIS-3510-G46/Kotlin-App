@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     //(libs.plugins.googleService)
+
     id("com.google.firebase.firebase-perf")
     id("com.google.gms.google-services")
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
@@ -37,6 +38,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -72,10 +74,16 @@ dependencies {
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.0")
 
     // Firebase auth
-    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-perf")
     implementation ("com.google.firebase:firebase-analytics:17.4.1")
+
+    // Firebase store for chats
+    implementation("com.google.firebase:firebase-firestore")
+    implementation ("com.google.android.gms:play-services-auth:20.2.0")
+    implementation ("com.google.android.gms:play-services-base:18.7.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
 
     // Camera dependencies
@@ -125,6 +133,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    //
 }
 
 

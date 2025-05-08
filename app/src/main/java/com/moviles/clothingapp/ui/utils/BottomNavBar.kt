@@ -3,6 +3,7 @@ package com.moviles.clothingapp.ui.utils
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CameraAlt
+import androidx.compose.material.icons.rounded.ChatBubble
 import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Map
@@ -37,7 +38,7 @@ fun BottomNavigationBar(navController: NavController) {
             BottomNavItem("cart", Icons.Rounded.ShoppingCart, "Cart"), // Implemented: YES
             BottomNavItem("camera", Icons.Rounded.CameraAlt, "Camera"), // Implemented: YES
             BottomNavItem("map/", Icons.Rounded.Map, "Map"), // Implemented: YES
-            //BottomNavItem("profile", Icons.Rounded.PersonOutline, "Profile") // Implemented: NO
+            BottomNavItem("chat", Icons.Rounded.ChatBubble, "Chat") // Implemented: -
         )
 
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
