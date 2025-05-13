@@ -3,6 +3,7 @@ package com.moviles.clothingapp.navigation
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -121,7 +122,10 @@ fun AppNavigation(navController: NavHostController,
                 favoritesViewModel,
                 cartViewModel,
                 onBack = { navController.popBackStack() },
-                onNavigateToCart = { navController.navigate("cart")}
+                onNavigateToCart = { navController.navigate("cart")},
+                onNavigateToChat = { chatPartnerId, productName ->
+                    navController.navigate("chat/$chatPartnerId/$productName")
+                }
             )
         }
 
@@ -152,12 +156,11 @@ fun AppNavigation(navController: NavHostController,
         composable("chat") {
             val currentUser = FirebaseAuth.getInstance().currentUser
             val currentUserId = currentUser?.uid
-            Log.d("ACTUAL_USER", currentUserId.toString())
             if (currentUserId != null) {
                 ChatListScreen(
                     currentUserId = currentUserId,
                     onChatClick = { receiverId ->
-                        navController.navigate("chat/$receiverId")
+                        navController.navigate("chat/$receiverId/-1")
                     },
                     onBackClick = { navController.popBackStack() }
                 )
@@ -165,7 +168,31 @@ fun AppNavigation(navController: NavHostController,
         }
 
 
+        composable(
+            route = "chat/{chatPartnerId}/{productId}",
+            arguments = listOf(
+                navArgument("chatPartnerId") { type = NavType.StringType },
+                navArgument("productId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val chatPartnerId = backStackEntry.arguments?.getString("chatPartnerId") ?: ""
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            val currentUserId = currentUser?.uid ?: ""
+            val productId = backStackEntry.arguments?.getInt("productId") ?: -1
 
+            if (currentUserId.isNotEmpty() && chatPartnerId.isNotEmpty()) {
+                ChatScreen(
+                    currentUserId = currentUserId,
+                    chatPartnerId = chatPartnerId,
+                    productId = productId,
+                    onBackClick = { navController.popBackStack() }
+                )
+            } else {
+                /* Handle error or redirect */
+                LaunchedEffect(Unit) {
+                    navController.popBackStack()
+                }
+            }
+        }
     }
 
 

@@ -1,9 +1,15 @@
 package com.moviles.clothingapp.chat.data
-
-import com.google.firebase.Timestamp
+import java.util.Date
 
 data class ChatOverview(
     val chatPartnerId: String = "",
     val lastMessage: String = "",
-    val timestamp: Timestamp? = null
+    val timestamp: Date = Date(),
+    val productId: Int = -1
+)
+
+
+data class ChatOverviewWithProduct(
+    val chatOverview: ChatOverview,
+    val productName: String?
 )
