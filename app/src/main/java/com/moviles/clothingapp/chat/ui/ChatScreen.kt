@@ -51,6 +51,9 @@ import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
 import com.moviles.clothingapp.ui.utils.NoInternetMessage
 import com.moviles.clothingapp.ui.utils.dmSansFamily
 import com.moviles.clothingapp.ui.utils.figtreeFamily
+import com.moviles.clothingapp.ui.utils.smallNoInternetMessage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -77,15 +80,19 @@ fun ChatScreen(
 
     /* Initialize conversation with product ID */
     LaunchedEffect(chatPartnerId, productId) {
-        viewModel.loadMessages()
+        withContext(Dispatchers.IO){
+            viewModel.loadMessages(context)
 
-        if (productId > 0) { /* If not default value, load product details */
-            viewModel.loadProductName(productId)
-            viewModel.initializeConversation(productId)
-        } else {
-            /* Try to load from chat metadata */
-            viewModel.loadConversationName()
+            if (productId > 0) { /* If not default value, load product details */
+                viewModel.loadProductName(productId)
+                viewModel.initializeConversation(productId)
+            } else {
+                /* Try to load from chat metadata */
+                viewModel.loadConversationName()
+            }
+
         }
+
     }
 
     /* UI message to send */
@@ -128,7 +135,11 @@ fun ChatScreen(
             }
         )
 
-        if (!isInternetAvailable(context)) {
+        if(!isInternetAvailable(context)){
+            smallNoInternetMessage()
+        }
+
+        if (!isInternetAvailable(context) && messages.isEmpty()) {
             Log.d("Status Internet", isInternetAvailable(context).toString())
             NoInternetMessage()
         } else {

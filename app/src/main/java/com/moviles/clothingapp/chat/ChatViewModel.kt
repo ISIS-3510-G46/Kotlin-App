@@ -1,5 +1,6 @@
 package com.moviles.clothingapp.chat
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,8 +10,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Source
 import com.moviles.clothingapp.chat.data.ChatMessage
 import com.moviles.clothingapp.chat.data.ChatOverview
+import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
 import com.moviles.clothingapp.ui.utils.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,10 +38,6 @@ class ChatViewModel(private val chatPartnerId: String) : ViewModel() {
 
     private val _productName = MutableStateFlow<String?>(null)
     val productName: StateFlow<String?> = _productName
-
-    init {
-        loadMessages()
-    }
 
 
     /****** Load product name from backend if available ******/
@@ -91,27 +90,49 @@ class ChatViewModel(private val chatPartnerId: String) : ViewModel() {
 
 
     /****** Load messages from firebase ******/
-    fun loadMessages() {
+    fun loadMessages(context: Context) {
         val currentUserId = auth.currentUser?.uid ?: return
         _isLoading.value = true
 
-        /* Create a unique chat ID from the two user IDs */
         val chatId = getChatId(currentUserId, chatPartnerId)
 
         messagesListener?.remove()
-        messagesListener = firestore.collection("chats")
-            .document(chatId)
-            .collection("messages")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, _ ->
-                _isLoading.value = false
 
-                if (snapshot != null) {
-                    val messagesList = snapshot.toObjects(ChatMessage::class.java)
-                    _messages.value = messagesList
-                    Log.d("ChatViewModel", "Num of msgs loaded: ${messagesList.size}")
+        if (!isInternetAvailable(context)) {
+            /* Load from cache only if no internet connection */
+            firestore.collection("chats")
+                .document(chatId)
+                .collection("messages")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get(Source.CACHE)
+                .addOnSuccessListener { snapshot ->
+                    _isLoading.value = false
+                    if (snapshot != null) {
+                        val messagesList = snapshot.toObjects(ChatMessage::class.java)
+                        _messages.value = messagesList
+                        Log.d("ChatViewModel", "Num of msgs loaded from cache: ${messagesList.size}")
+                    }
                 }
-            }
+                .addOnFailureListener {
+                    _isLoading.value = false
+                    _messages.value = emptyList()
+                    Log.d("ChatViewModel", "No messages in cache or error occurred.")
+                }
+        } else {
+            /* Use real-time updates when online */
+            messagesListener = firestore.collection("chats")
+                .document(chatId)
+                .collection("messages")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener { snapshot, _ ->
+                    _isLoading.value = false
+                    if (snapshot != null) {
+                        val messagesList = snapshot.toObjects(ChatMessage::class.java)
+                        _messages.value = messagesList
+                        Log.d("ChatViewModel", "Num of msgs loaded: ${messagesList.size}")
+                    }
+                }
+        }
     }
 
     /****** Send message to firebase ******/
