@@ -1,18 +1,14 @@
 package com.moviles.clothingapp.post.data
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import com.moviles.clothingapp.discover.ui.data.FilterUsageDto
 import com.moviles.clothingapp.favoritePosts.data.BrandCount
 import com.moviles.clothingapp.ui.utils.RetrofitInstance
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 class PostRepository(/*private val postDao: PostDao*/) {
     private val apiService = RetrofitInstance.apiService
@@ -87,8 +83,8 @@ class PostRepository(/*private val postDao: PostDao*/) {
     suspend fun fetchPostById(id: Int): PostData? {
         return safeApiCall { apiService.fetchClothesById(id) }
     }
-    
-    
+
+
     private suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): T? {
         return try {
             val response = apiCall()
@@ -131,7 +127,7 @@ class PostRepository(/*private val postDao: PostDao*/) {
 
 
         @GET("clothing/{id}")
-        suspend fun fetchClothesById(@retrofit2.http.Path("id") id: Int): Response<PostData>
+        suspend fun fetchClothesById(@Path("id") id: Int): Response<PostData>
 
         @POST("favorites/add")
         suspend fun addFavorite(@Body brandCount: BrandCount): Response<Any>

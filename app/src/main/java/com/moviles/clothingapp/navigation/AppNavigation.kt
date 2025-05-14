@@ -1,7 +1,9 @@
 package com.moviles.clothingapp.navigation
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -11,8 +13,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
 import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.cart.ui.CartScreen
+import com.moviles.clothingapp.chat.ui.ChatListScreen
+import com.moviles.clothingapp.chat.ui.ChatScreen
 import com.moviles.clothingapp.createPost.ui.CameraScreen
 import com.moviles.clothingapp.createPost.ui.CreatePostScreen
 import com.moviles.clothingapp.post.ui.DetailedPostScreen
@@ -117,7 +122,10 @@ fun AppNavigation(navController: NavHostController,
                 favoritesViewModel,
                 cartViewModel,
                 onBack = { navController.popBackStack() },
-                onNavigateToCart = { navController.navigate("cart")}
+                onNavigateToCart = { navController.navigate("cart")},
+                onNavigateToChat = { chatPartnerId, productName ->
+                    navController.navigate("chat/$chatPartnerId/$productName")
+                }
             )
         }
 
@@ -145,8 +153,46 @@ fun AppNavigation(navController: NavHostController,
             FavoritesScreen(navController, favoritesViewModel)
         }
 
+        composable("chat") {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            val currentUserId = currentUser?.uid
+            if (currentUserId != null) {
+                ChatListScreen(
+                    currentUserId = currentUserId,
+                    onChatClick = { receiverId ->
+                        navController.navigate("chat/$receiverId/-1")
+                    },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+        }
 
 
+        composable(
+            route = "chat/{chatPartnerId}/{productId}",
+            arguments = listOf(
+                navArgument("chatPartnerId") { type = NavType.StringType },
+                navArgument("productId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val chatPartnerId = backStackEntry.arguments?.getString("chatPartnerId") ?: ""
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            val currentUserId = currentUser?.uid ?: ""
+            val productId = backStackEntry.arguments?.getInt("productId") ?: -1
+
+            if (currentUserId.isNotEmpty() && chatPartnerId.isNotEmpty()) {
+                ChatScreen(
+                    currentUserId = currentUserId,
+                    chatPartnerId = chatPartnerId,
+                    productId = productId,
+                    onBackClick = { navController.popBackStack() }
+                )
+            } else {
+                /* Handle error or redirect */
+                LaunchedEffect(Unit) {
+                    navController.popBackStack()
+                }
+            }
+        }
     }
 
 

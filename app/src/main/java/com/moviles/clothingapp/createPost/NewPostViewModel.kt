@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.moviles.clothingapp.createPost.data.ImageStoringRepository
 import com.moviles.clothingapp.post.data.PostData
 import com.moviles.clothingapp.post.data.PostRepository
@@ -22,6 +23,11 @@ import java.text.DecimalFormat
 class NewPostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = PostRepository()
     private val appwriteRepository = ImageStoringRepository(application.applicationContext)
+    private val auth = FirebaseAuth.getInstance()
+
+    /* Get current user id */
+    private val currentUserId: String
+        get() = auth.currentUser?.uid ?: ""
 
     /* Title field */
     private val _title = mutableStateOf("")
@@ -119,7 +125,8 @@ class NewPostViewModel(application: Application) : AndroidViewModel(application)
                     price = formattedPrice.value,
                     image = imageUrl,
                     color = selectedColor.value,
-                    thumbnail = ""
+                    thumbnail = "",
+                    userId = currentUserId
                 )
 
                 val response = withContext(Dispatchers.IO){
@@ -129,7 +136,6 @@ class NewPostViewModel(application: Application) : AndroidViewModel(application)
                     onResult(response != null)  // Notify success or failure
                 }
             } catch (e: Exception) {
-                e.printStackTrace()  // Log error for debugging
                 withContext(Dispatchers.Main) {
                     onResult(false)
                 }
