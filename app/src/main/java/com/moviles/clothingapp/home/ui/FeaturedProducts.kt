@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -25,7 +26,8 @@ import com.moviles.clothingapp.ui.utils.dmSansFamily
 /* SECCION DESTACADOS */
 @Composable
 fun FeaturedProducts(navController: NavController) {
-    val featured by RecentProductsCache.flow.collectAsState()
+    val featured by remember { RecentProductsCache.flow }.collectAsState(initial = emptyList())
+
 
     LaunchedEffect(Unit) {
         RecentProductsCache.load()

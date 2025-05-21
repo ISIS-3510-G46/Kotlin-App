@@ -8,12 +8,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.rounded.Chat
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.ChatBubbleOutline
 import androidx.compose.material.icons.rounded.CheckCircleOutline
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.ShoppingCart
@@ -89,13 +88,16 @@ fun DetailedPostScreen(
             }
             val bucketId = BuildConfig.BUCKET_ID
             val projectId = "moviles"
-            val imageUrl = remember(product!!.image) {
-                if (product!!.image.startsWith("http")) {
-                    product!!.image
-                } else {
-                    "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${product!!.image}/view?project=$projectId"
+            val imageUrl = product?.let {
+                remember {
+                    if (it.image.startsWith("http")) {
+                        it.image
+                    } else {
+                        "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${it.image}/view?project=$projectId"
+                    }
                 }
             }
+
 
 
             Column(
@@ -133,7 +135,7 @@ fun DetailedPostScreen(
                             .background(Color.White, CircleShape)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
+                            imageVector = Icons.Rounded.ArrowBackIosNew,
                             contentDescription = "Back",
                             tint = Color.Black
                         )
@@ -156,7 +158,7 @@ fun DetailedPostScreen(
                             imageVector = if (isFavorite.value)
                                 Icons.Rounded.Favorite
                             else
-                                Icons.Default.FavoriteBorder,
+                                Icons.Rounded.FavoriteBorder,
                             contentDescription = "Favorite",
                             tint = Color.Black
                         )
@@ -377,7 +379,7 @@ fun DetailedPostScreen(
                                 .background(Color.White, CircleShape)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBackIosNew,
+                                imageVector = Icons.Rounded.ArrowBackIosNew,
                                 contentDescription = "Back",
                                 tint = Color.Black
                             )

@@ -34,6 +34,8 @@ import com.moviles.clothingapp.ui.utils.SearchBar
 import com.moviles.clothingapp.post.PostViewModel
 import com.moviles.clothingapp.post.ui.PostItem
 import android.util.Log
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import com.moviles.clothingapp.ui.utils.NetworkHelper.isInternetAvailable
 import com.moviles.clothingapp.ui.utils.NoInternetMessage
@@ -64,12 +66,14 @@ fun DiscoverScreen(navController: NavController, viewModel: PostViewModel, query
     var maxPrice by remember { mutableStateOf("") }
 
 
+    val currentPosts by rememberUpdatedState(posts)
 
-    LaunchedEffect(posts) {
-        if (posts.isNotEmpty()) {
+    LaunchedEffect(Unit) {
+        if (currentPosts.isNotEmpty()) {
             trace.stop()
         }
     }
+
 
     Scaffold(
         topBar = {
@@ -96,7 +100,7 @@ fun DiscoverScreen(navController: NavController, viewModel: PostViewModel, query
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
+
                 .padding(paddingValues)
         ) {
             SearchBar(
@@ -108,16 +112,21 @@ fun DiscoverScreen(navController: NavController, viewModel: PostViewModel, query
                 navController
             )
 
-            val filteredPosts = posts.filter { post ->
-                val postPrice = post.price.replace(".", "").replace(",", "").toIntOrNull() ?: 0
-                (selectedCategory == "Todos" || post.category == selectedCategory) &&
-                        (selectedColor == "Todos" || post.color == selectedColor) &&
-                        (selectedSize == "Todos" || post.size == selectedSize) &&
-                        (selectedGroup == "Todos" || post.group == selectedGroup) &&
-                        (searchQuery.isEmpty() || post.name.contains(searchQuery, ignoreCase = true)) &&
-                        (minPrice.toIntOrNull()?.let { postPrice >= it } ?: true) &&
-                        (maxPrice.toIntOrNull()?.let { postPrice <= it } ?: true)
+            val filteredPosts by remember(posts, selectedCategory, selectedColor, selectedSize, selectedGroup, minPrice, maxPrice, searchQuery) {
+                derivedStateOf {
+                    posts.filter { post ->
+                        val postPrice = post.price.replace(".", "").replace(",", "").toIntOrNull() ?: 0
+                        (selectedCategory == "Todos" || post.category == selectedCategory) &&
+                                (selectedColor == "Todos" || post.color == selectedColor) &&
+                                (selectedSize == "Todos" || post.size == selectedSize) &&
+                                (selectedGroup == "Todos" || post.group == selectedGroup) &&
+                                (searchQuery.isEmpty() || post.name.contains(searchQuery, ignoreCase = true)) &&
+                                (minPrice.toIntOrNull()?.let { postPrice >= it } ?: true) &&
+                                (maxPrice.toIntOrNull()?.let { postPrice <= it } ?: true)
+                    }
+                }
             }
+
 
             if (!isInternetAvailable(context)) {
                 Log.d("Status Internet", isInternetAvailable(context).toString())
