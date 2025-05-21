@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 *     to send the information of the products to the Categories and FeaturedProducts views.
 */
 class HomeViewModel : ViewModel() {
-    private val _featured = MutableLiveData<List<PostData>>(emptyList())
+    private val _featured = MutableLiveData<List<PostData>>()
     private val postRepository = PostRepository()
     private var appContext: Context? = null
     private val favoritesViewModel = FavoritesViewModel()
@@ -29,7 +29,7 @@ class HomeViewModel : ViewModel() {
     private val _showNewFavoriteBrandBanner = MutableLiveData<Boolean>(false)
     val showNewFavoriteBrandBanner: LiveData<Boolean> = _showNewFavoriteBrandBanner
 
-    private val _newFavoriteBrandPosts = MutableLiveData<List<PostData>>(emptyList())
+    private val _newFavoriteBrandPosts = MutableLiveData<List<PostData>>()
     val newFavoriteBrandPosts: LiveData<List<PostData>> = _newFavoriteBrandPosts
 
     /* Last loaded posts before refreshing */
@@ -54,7 +54,7 @@ class HomeViewModel : ViewModel() {
                 val recent = postResult.takeLast(6)
                 if (recent.isNotEmpty()) {
                     RecentProductsCache.put(recent)
-                    _featured.postValue(recent)
+                    _featured.value = recent
                 }
             }
         }

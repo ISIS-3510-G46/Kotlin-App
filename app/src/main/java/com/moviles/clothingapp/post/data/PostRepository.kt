@@ -13,76 +13,21 @@ import retrofit2.http.Path
 class PostRepository(/*private val postDao: PostDao*/) {
     private val apiService = RetrofitInstance.apiService
 
-    /* Get all posts from local database TODO: Connect this with ROM or something for cache maybe?
-    fun getPosts(): LiveData<List<PostData>> {
-        return postDao.getPosts()
-    }
-    */
-
     /* Function to fetch all products from backend */
-    suspend fun fetchRepository(): List<PostData>? {
-        return try {
-            val response = apiService.fetchClothes()
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                Log.e("PostRepository", "Response failed: ${response.code()}")
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("PostRepository", "Error: ${e.message}")
-            null
-        }
-    }
+    suspend fun fetchRepository(): List<PostData>? =
+        safeApiCall { apiService.fetchClothes() }
 
+    suspend fun fetchPostsFiltered(): List<PostData>? =
+        safeApiCall { apiService.fetchClothesFiltered() }
 
-    /* Fetch products by category */
-    suspend fun fetchPostsFiltered(): List<PostData>? {
-        return try {
-            val response = apiService.fetchClothesFiltered()
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                Log.e("PostRepository", "Response failed: ${response.code()}")
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("PostRepository", "Error: ${e.message}")
-            null
-        }
-    }
+    suspend fun fetchPostsByCategory(categoryId: String): List<PostData>? =
+        safeApiCall { apiService.fetchClothesByCategory(categoryId) }
 
+    suspend fun createPost(postData: PostData): PostData? =
+        safeApiCall { apiService.createPost(postData) }
 
-    /* Function used to search clothing of a specific category */
-    suspend fun fetchPostsByCategory(categoryId: String): List<PostData>? {
-        return try {
-            val response = apiService.fetchClothesByCategory(categoryId)
-            if (response.isSuccessful) response.body() else null
-        } catch (e: Exception) {
-            Log.e("PostRepository", "Error fetching category: ${e.message}")
-            null
-        }
-    }
-
-    /* Create Post function to post a new clothing item */
-    suspend fun createPost(postData: PostData): PostData? {
-        return try {
-            val response = apiService.createPost(postData)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                Log.e("PostRepository", "Error creating post: ${response.code()}")
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("PostRepository", "Exception: ${e}")
-            null
-        }
-    }
-            
-    suspend fun fetchPostById(id: Int): PostData? {
-        return safeApiCall { apiService.fetchClothesById(id) }
-    }
+    suspend fun fetchPostById(id: Int): PostData? =
+        safeApiCall { apiService.fetchClothesById(id) }
 
 
     private suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): T? {

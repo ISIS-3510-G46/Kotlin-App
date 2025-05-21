@@ -15,9 +15,12 @@ import com.moviles.clothingapp.login.ResetPasswordViewModel
 import com.moviles.clothingapp.weatherBanner.WeatherViewModel
 import android.Manifest
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -26,7 +29,9 @@ import com.moviles.clothingapp.cart.CartViewModel
 import com.moviles.clothingapp.home.data.cache.RecentProductsCache
 import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /* The mainActivity initializes all the app */
 class MainActivity : ComponentActivity() {
@@ -53,7 +58,10 @@ class MainActivity : ComponentActivity() {
         }
 
         /* Request location permissions */
-        requestLocationPermissions()
+        // requestLocationPermissions()
+        Handler(Looper.getMainLooper()).postDelayed({
+            requestLocationPermissions()
+        }, 1000)
 
         /* Log device information and metrics for firebase */
         logDeviceInfo()
@@ -63,15 +71,22 @@ class MainActivity : ComponentActivity() {
 
     /* Auxiliary function to record device info in firebase */
     private fun logDeviceInfo() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            Log.d("FirebasePerf", "Firebase Performance Monitoring initialized: ${FirebasePerformance.getInstance()}")
-            val deviceInfo = Bundle().apply {
-                putString("device_model", Build.MODEL)
-                putString("device_brand", Build.BRAND)
-                putString("os_version", Build.VERSION.RELEASE)
+        lifecycleScope.launch {
+            delay(3000) // wait 3 seconds before rendering
+            Log.d(
+                "FirebasePerf",
+                "Firebase Performance Monitoring initialized: ${FirebasePerformance.getInstance()}"
+            )
+            val deviceInfo = bundleOf(
+                "device_model" to Build.MODEL,
+                "device_brand" to Build.BRAND,
+                "os_version" to Build.VERSION.RELEASE
+            )
+
+            withContext(Dispatchers.IO) { // adding dispatcher here to avoid crashing
+                firebaseAnalytics.logEvent("device_info", deviceInfo)
+                Log.d("DEVICES", deviceInfo.toString())
             }
-            firebaseAnalytics.logEvent("device_info", deviceInfo)
-            Log.d("DEVICES", deviceInfo.toString())
         }
     }
 
