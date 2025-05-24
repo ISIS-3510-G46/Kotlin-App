@@ -7,6 +7,7 @@ import androidx.compose.material.icons.rounded.ChatBubble
 import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Map
+import androidx.compose.material.icons.rounded.PersonOutline
 import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -27,7 +28,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 *   - Each nav item has a route established here and in the navigation package - very important to name them equally.
  */
 @Composable
-// TODO: Implementar la funcion de ir a donde se pulsa para cada boton.
 fun BottomNavigationBar(navController: NavController) {
     NavigationBar(
         containerColor = DarkGreen
@@ -35,10 +35,9 @@ fun BottomNavigationBar(navController: NavController) {
         val items = listOf(
             BottomNavItem("home", Icons.Rounded.Home, "Home"), // Implemented: YES
             BottomNavItem("discover/", Icons.Rounded.Explore, "Discover"), // Implemented: YES
-            BottomNavItem("cart", Icons.Rounded.ShoppingCart, "Cart"), // Implemented: YES
-            BottomNavItem("camera", Icons.Rounded.CameraAlt, "Camera"), // Implemented: YES
             BottomNavItem("map/", Icons.Rounded.Map, "Map"), // Implemented: YES
-            BottomNavItem("chat", Icons.Rounded.ChatBubble, "Chat") // Implemented: -
+            BottomNavItem("chat", Icons.Rounded.ChatBubble, "Chat"), // Implemented: -
+            BottomNavItem("profile", Icons.Rounded.PersonOutline, "Profile")
         )
 
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route

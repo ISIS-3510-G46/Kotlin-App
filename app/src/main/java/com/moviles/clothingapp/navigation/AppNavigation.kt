@@ -34,6 +34,7 @@ import com.moviles.clothingapp.home.HomeViewModel
 import com.moviles.clothingapp.login.LoginViewModel
 import com.moviles.clothingapp.post.PostViewModel
 import com.moviles.clothingapp.login.ResetPasswordViewModel
+import com.moviles.clothingapp.profile.ui.ProfileScreen
 import com.moviles.clothingapp.weatherBanner.WeatherViewModel
 
 
@@ -193,6 +194,11 @@ fun AppNavigation(navController: NavHostController,
                 }
             }
         }
+
+        composable("profile") {
+            ProfileScreen(navController)
+        }
+
     }
 
 
