@@ -4,7 +4,6 @@ import android.content.Context
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import coil.util.DebugLogger
 
 object CoilProvider {
     fun get(ctx: Context) = ImageLoader.Builder(ctx)

@@ -1,7 +1,6 @@
 package com.moviles.clothingapp.navigation
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,23 +19,23 @@ import com.moviles.clothingapp.chat.ui.ChatListScreen
 import com.moviles.clothingapp.chat.ui.ChatScreen
 import com.moviles.clothingapp.createPost.ui.CameraScreen
 import com.moviles.clothingapp.createPost.ui.CreatePostScreen
-import com.moviles.clothingapp.post.ui.DetailedPostScreen
 import com.moviles.clothingapp.discover.ui.DiscoverScreen
 import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import com.moviles.clothingapp.favoritePosts.ui.FavoritesScreen
-import com.moviles.clothingapp.weatherBanner.ui.WeatherCategoryScreen
+import com.moviles.clothingapp.home.HomeViewModel
 import com.moviles.clothingapp.home.ui.MainScreen
+import com.moviles.clothingapp.login.LoginViewModel
+import com.moviles.clothingapp.login.ResetPasswordViewModel
 import com.moviles.clothingapp.login.ui.CreateAccountScreen
 import com.moviles.clothingapp.login.ui.LoginScreen
 import com.moviles.clothingapp.login.ui.ResetPasswordScreen
 import com.moviles.clothingapp.map.ui.MapScreen
-import com.moviles.clothingapp.home.HomeViewModel
-import com.moviles.clothingapp.login.LoginViewModel
 import com.moviles.clothingapp.post.PostViewModel
-import com.moviles.clothingapp.login.ResetPasswordViewModel
+import com.moviles.clothingapp.post.ui.DetailedPostScreen
 import com.moviles.clothingapp.profile.ui.ProfileScreen
+import com.moviles.clothingapp.profile.ui.SettingsScreen
 import com.moviles.clothingapp.weatherBanner.WeatherViewModel
-
+import com.moviles.clothingapp.weatherBanner.ui.WeatherCategoryScreen
 
 
 /* Navigation component called to change between pages
@@ -197,6 +196,13 @@ fun AppNavigation(navController: NavHostController,
 
         composable("profile") {
             ProfileScreen(navController)
+        }
+
+
+
+
+        composable("settings") {
+            SettingsScreen(navController)
         }
 
     }
