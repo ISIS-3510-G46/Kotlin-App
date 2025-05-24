@@ -9,6 +9,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 class PostRepository(/*private val postDao: PostDao*/) {
     private val apiService = RetrofitInstance.apiService
@@ -22,6 +23,9 @@ class PostRepository(/*private val postDao: PostDao*/) {
 
     suspend fun fetchPostsByCategory(categoryId: String): List<PostData>? =
         safeApiCall { apiService.fetchClothesByCategory(categoryId) }
+
+    suspend fun fetchPostsByUser(userId: String): List<PostData>? =
+        safeApiCall { apiService.fetchClothesByCategory(userId) }
 
     suspend fun createPost(postData: PostData): PostData? =
         safeApiCall { apiService.createPost(postData) }
@@ -61,15 +65,14 @@ class PostRepository(/*private val postDao: PostDao*/) {
         @GET("clothing") //TODO documentation
         suspend fun fetchClothesFiltered(): Response<List<PostData>>
 
-
         @GET("clothing/category/{categoryId}") // Fetch by category
         suspend fun fetchClothesByCategory(@retrofit2.http.Path("categoryId") categoryId: String): Response<List<PostData>>
 
+        @GET("clothing")
+        suspend fun fetchClothesByUserId(@Query("userId") userId: String): Response<List<PostData>>
 
         @POST("create-post") // POST a new piece of clothing
         suspend fun createPost(@Body newPost: PostData): Response<PostData>
-
-
 
         @GET("clothing/{id}")
         suspend fun fetchClothesById(@Path("id") id: Int): Response<PostData>
