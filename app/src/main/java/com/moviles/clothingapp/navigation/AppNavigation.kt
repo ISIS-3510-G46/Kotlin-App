@@ -1,7 +1,6 @@
 package com.moviles.clothingapp.navigation
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,25 +19,25 @@ import com.moviles.clothingapp.chat.ui.ChatListScreen
 import com.moviles.clothingapp.chat.ui.ChatScreen
 import com.moviles.clothingapp.createPost.ui.CameraScreen
 import com.moviles.clothingapp.createPost.ui.CreatePostScreen
-import com.moviles.clothingapp.post.ui.DetailedPostScreen
 import com.moviles.clothingapp.discover.ui.DiscoverScreen
 import com.moviles.clothingapp.favoritePosts.FavoritesViewModel
 import com.moviles.clothingapp.favoritePosts.ui.FavoritesScreen
-import com.moviles.clothingapp.weatherBanner.ui.WeatherCategoryScreen
+import com.moviles.clothingapp.home.HomeViewModel
 import com.moviles.clothingapp.home.ui.MainScreen
+import com.moviles.clothingapp.login.LoginViewModel
+import com.moviles.clothingapp.login.ResetPasswordViewModel
 import com.moviles.clothingapp.login.ui.CreateAccountScreen
 import com.moviles.clothingapp.login.ui.LoginScreen
 import com.moviles.clothingapp.login.ui.ResetPasswordScreen
 import com.moviles.clothingapp.map.ui.MapScreen
-import com.moviles.clothingapp.home.HomeViewModel
-import com.moviles.clothingapp.login.LoginViewModel
 import com.moviles.clothingapp.post.PostViewModel
-import com.moviles.clothingapp.login.ResetPasswordViewModel
+import com.moviles.clothingapp.post.ui.DetailedPostScreen
 import com.moviles.clothingapp.profile.ui.ProfileScreen
+import com.moviles.clothingapp.profile.ui.SettingsScreen
 import com.moviles.clothingapp.userPostList.UserPostListViewModel
 import com.moviles.clothingapp.userPostList.ui.UserPostListScreen
 import com.moviles.clothingapp.weatherBanner.WeatherViewModel
-
+import com.moviles.clothingapp.weatherBanner.ui.WeatherCategoryScreen
 
 
 /* Navigation component called to change between pages
@@ -47,12 +46,13 @@ import com.moviles.clothingapp.weatherBanner.WeatherViewModel
 *   - Each composable here declares a route which must be the same stated in the component.
 * */
 @Composable
-fun AppNavigation(navController: NavHostController,
-                  loginViewModel: LoginViewModel,
-                  resetPasswordViewModel: ResetPasswordViewModel,
-                  weatherViewModel: WeatherViewModel,
-                  cartViewModel: CartViewModel,
-                  favoritesViewModel: FavoritesViewModel
+fun AppNavigation(
+    navController: NavHostController,
+    loginViewModel: LoginViewModel,
+    resetPasswordViewModel: ResetPasswordViewModel,
+    weatherViewModel: WeatherViewModel,
+    cartViewModel: CartViewModel,
+    favoritesViewModel: FavoritesViewModel
 
 ) {
 
@@ -60,7 +60,10 @@ fun AppNavigation(navController: NavHostController,
     val isUserLoggedIn by loginViewModel.navigateToHome.collectAsStateWithLifecycle()
 
     /* Start navigation in login page. Route: login */
-    NavHost(navController = navController, startDestination = if (isUserLoggedIn) "home" else "login") {
+    NavHost(
+        navController = navController,
+        startDestination = if (isUserLoggedIn) "home" else "login"
+    ) {
         composable("login") {
             LoginScreen(
                 loginViewModel = loginViewModel,
@@ -100,7 +103,11 @@ fun AppNavigation(navController: NavHostController,
             arguments = listOf(navArgument("categoryId") { type = NavType.StringType })
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId") ?: "sale"
-            WeatherCategoryScreen(categoryId = categoryId, navController, viewModel = weatherViewModel)
+            WeatherCategoryScreen(
+                categoryId = categoryId,
+                navController,
+                viewModel = weatherViewModel
+            )
         }
 
 
@@ -125,7 +132,7 @@ fun AppNavigation(navController: NavHostController,
                 favoritesViewModel,
                 cartViewModel,
                 onBack = { navController.popBackStack() },
-                onNavigateToCart = { navController.navigate("cart")},
+                onNavigateToCart = { navController.navigate("cart") },
                 onNavigateToChat = { chatPartnerId, productName ->
                     navController.navigate("chat/$chatPartnerId/$productName")
                 }
@@ -202,6 +209,13 @@ fun AppNavigation(navController: NavHostController,
 
         composable("profile") {
             ProfileScreen(navController)
+        }
+
+
+
+
+        composable("settings") {
+            SettingsScreen(navController)
         }
 
     }

@@ -83,6 +83,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore:24.9.0")
     implementation ("com.google.android.gms:play-services-auth:20.2.0")
     implementation ("com.google.android.gms:play-services-base:18.7.0")
+    implementation(libs.androidx.work.runtime.ktx)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
 
