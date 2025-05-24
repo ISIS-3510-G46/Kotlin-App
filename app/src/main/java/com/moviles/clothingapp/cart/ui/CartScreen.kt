@@ -125,9 +125,7 @@ fun CartScreen(
                             onRemove = {
                                 val productId = post.id
                                 try {
-                                    if (productId != null) {
-                                        scope.launch{cartViewModel.removeFromCart(context, productId.toString())}
-                                    }
+                                    scope.launch{cartViewModel.removeFromCart(context, productId.toString())}
                                 } catch (e: Exception) {
                                     Log.e("CartScreen", "Failed to del item: $productId", e)
                                 }
