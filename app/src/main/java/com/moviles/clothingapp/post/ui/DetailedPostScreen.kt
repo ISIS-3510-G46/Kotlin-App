@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
+import androidx.compose.material.icons.rounded.ChatBubbleOutline
+import androidx.compose.material.icons.rounded.CheckCircleOutline
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.ShoppingCart
@@ -32,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
 import com.moviles.clothingapp.BuildConfig
 import com.moviles.clothingapp.R
 import com.moviles.clothingapp.cart.CartViewModel
@@ -48,7 +51,8 @@ fun DetailedPostScreen(
     favoritesViewModel: FavoritesViewModel,
     cartViewModel: CartViewModel,
     onBack: () -> Unit,
-    onNavigateToCart: () -> Unit
+    onNavigateToCart: () -> Unit,
+    onNavigateToChat: (String, String) -> Unit,
 ) {
     val product by viewModel.post.collectAsStateWithLifecycle()
     val isFavorite = remember(product) {
@@ -56,6 +60,9 @@ fun DetailedPostScreen(
     }
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val currentUserId = currentUser?.uid ?: ""
 
     LaunchedEffect(productId) {
         viewModel.fetchPostById(productId)
@@ -81,13 +88,16 @@ fun DetailedPostScreen(
             }
             val bucketId = BuildConfig.BUCKET_ID
             val projectId = "moviles"
-            val imageUrl = remember(product!!.image) {
-                if (product!!.image.startsWith("http")) {
-                    product!!.image
-                } else {
-                    "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${product!!.image}/view?project=$projectId"
+            val imageUrl = product?.let {
+                remember {
+                    if (it.image.startsWith("http")) {
+                        it.image
+                    } else {
+                        "https://cloud.appwrite.io/v1/storage/buckets/$bucketId/files/${it.image}/view?project=$projectId"
+                    }
                 }
             }
+
 
 
             Column(
@@ -125,7 +135,7 @@ fun DetailedPostScreen(
                             .background(Color.White, CircleShape)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
+                            imageVector = Icons.Rounded.ArrowBackIosNew,
                             contentDescription = "Back",
                             tint = Color.Black
                         )
@@ -148,7 +158,7 @@ fun DetailedPostScreen(
                             imageVector = if (isFavorite.value)
                                 Icons.Rounded.Favorite
                             else
-                                Icons.Default.FavoriteBorder,
+                                Icons.Rounded.FavoriteBorder,
                             contentDescription = "Favorite",
                             tint = Color.Black
                         )
@@ -239,39 +249,106 @@ fun DetailedPostScreen(
                     }
 
 
+                    /* Message to seller button */
+                    if (product?.userId != currentUserId) {
+                        OutlinedButton(
+                            onClick = {
+                                /* If product has user id go to the chat */
+                                product?.userId?.let { chatPartnerId ->
+                                    /* Navigation to chat with sellerId */
+                                    product!!.id?.let { onNavigateToChat(chatPartnerId, it) }
+                                } ?: Toast.makeText(
+                                    context,
+                                    "No se puede contactar al vendedor (id nulo)",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .height(48.dp),
+                            border = BorderStroke(1.dp, DarkGreen),
+                            shape = RoundedCornerShape(24.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = DarkGreen)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.ChatBubbleOutline,
+                                contentDescription = null,
+                                tint = DarkGreen
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Contactar al vendedor",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
 
 
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    // Add to cart button
-                    Button(
-                        onClick = {
-                            product?.let {
-                                Log.d("DetailedPostScreen", "Adding product to cart: ${it.name}, ID: ${it.id}, Price: ${it.price}")
-                                cartViewModel.addToCart(context, it)
-                                Toast.makeText(context, "Producto añadido al carrito", Toast.LENGTH_SHORT).show()
-                                onNavigateToCart()
+                    /* Add to cart button */
+                    if (product?.userId == currentUserId) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .height(56.dp)
+                                .background(
+                                    color = Color(0xFF388E3C),
+                                    shape = RoundedCornerShape(28.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.CheckCircleOutline,
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Esta es tu publicación",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
                             }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                        shape = RoundedCornerShape(28.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.ShoppingCart,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Agregar al carrito | " + "$${product!!.price}",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
-                        )
+                        }
+                    } else {
+                        Button(
+                            onClick = {
+                                product?.let {
+                                    Log.d("DetailedPostScreen", "Adding product to cart: ${it.name}, ID: ${it.id}, Price: ${it.price}")
+                                    cartViewModel.addToCart(context, it)
+                                    Toast.makeText(context, "Producto añadido al carrito", Toast.LENGTH_SHORT).show()
+                                    onNavigateToCart()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                            shape = RoundedCornerShape(28.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.ShoppingCart,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Agregar al carrito | " + "$${product!!.price}",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }
@@ -302,7 +379,7 @@ fun DetailedPostScreen(
                                 .background(Color.White, CircleShape)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBackIosNew,
+                                imageVector = Icons.Rounded.ArrowBackIosNew,
                                 contentDescription = "Back",
                                 tint = Color.Black
                             )

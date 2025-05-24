@@ -25,7 +25,7 @@ abstract class RoomDB : RoomDatabase() {
                     context.applicationContext,
                     RoomDB::class.java,
                     "app_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance
             }

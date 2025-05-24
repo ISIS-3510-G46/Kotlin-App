@@ -74,7 +74,7 @@ fun smallNoInternetMessage(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "No cuentas con conexion a internet, por lo que algunas funciones podrian no estar disponibles, porfavor conectate a internet.",
+                text = "No cuentas con connexion a internet, por lo que algunas funciones podrian no estar disponibles, favor conectate a internet.",
                 fontFamily = figtreeFamily,
                 fontWeight = FontWeight.Medium,
                 color = Color.Black

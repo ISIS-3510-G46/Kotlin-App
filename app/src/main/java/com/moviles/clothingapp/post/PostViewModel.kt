@@ -30,11 +30,8 @@ class PostViewModel : ViewModel() {
     }
 
     private fun fetchPostsFiltered() {
-        viewModelScope.launch(Dispatchers.IO) {  /* Get data with IO thread pool */
-            val result = repository.fetchPostsFiltered() // Ensure repository is returning data
-            withContext(Dispatchers.Main) {
-                _posts.value = result ?: emptyList()
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            _posts.value = repository.fetchPostsFiltered() ?: emptyList()
         }
     }
 

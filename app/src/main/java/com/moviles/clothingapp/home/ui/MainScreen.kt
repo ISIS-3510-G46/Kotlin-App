@@ -1,7 +1,6 @@
 package com.moviles.clothingapp.home.ui
 
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,7 +41,6 @@ fun MainScreen(
 ) {
     val banner = weatherViewModel.bannerType.observeAsState()
     val searchText = remember { mutableStateOf("") } // Store search text
-    Log.d("MainScreen", "Observed banner value: ${banner.value}")
 
     val isRefreshing = remember { mutableStateOf(false) }
     val showNewFavoriteBrandBanner by homeViewModel.showNewFavoriteBrandBanner.observeAsState(false)
@@ -53,8 +51,10 @@ fun MainScreen(
     LaunchedEffect(Unit) {
         trace.start() // Start tracing when screen loads
         favoritesViewModel.initialize(context)
+    }
 
-        if (banner.value != null){
+    LaunchedEffect(banner.value) {
+        if (banner.value != null) {
             trace.stop()
         }
     }
