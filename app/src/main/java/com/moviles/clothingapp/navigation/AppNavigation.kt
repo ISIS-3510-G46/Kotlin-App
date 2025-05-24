@@ -35,6 +35,8 @@ import com.moviles.clothingapp.login.LoginViewModel
 import com.moviles.clothingapp.post.PostViewModel
 import com.moviles.clothingapp.login.ResetPasswordViewModel
 import com.moviles.clothingapp.profile.ui.ProfileScreen
+import com.moviles.clothingapp.userPostList.UserPostListViewModel
+import com.moviles.clothingapp.userPostList.ui.UserPostListScreen
 import com.moviles.clothingapp.weatherBanner.WeatherViewModel
 
 
@@ -193,6 +195,9 @@ fun AppNavigation(navController: NavHostController,
                     navController.popBackStack()
                 }
             }
+        }
+        composable("userPosts") {
+            UserPostListScreen(navController, UserPostListViewModel())
         }
 
         composable("profile") {
