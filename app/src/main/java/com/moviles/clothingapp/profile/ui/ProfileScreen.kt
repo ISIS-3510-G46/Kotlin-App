@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.rounded.Article
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.ShoppingCart
@@ -86,7 +85,8 @@ fun ProfileScreen(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(16.dp)
-                )}
+                )
+            }
         },
         bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
@@ -145,7 +145,8 @@ fun ProfileScreen(
                                     tint = Color(0xFF9575CD)
                                 )
                             }
-                    }}
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 

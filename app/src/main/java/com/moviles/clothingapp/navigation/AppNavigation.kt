@@ -44,12 +44,13 @@ import com.moviles.clothingapp.weatherBanner.ui.WeatherCategoryScreen
 *   - Each composable here declares a route which must be the same stated in the component.
 * */
 @Composable
-fun AppNavigation(navController: NavHostController,
-                  loginViewModel: LoginViewModel,
-                  resetPasswordViewModel: ResetPasswordViewModel,
-                  weatherViewModel: WeatherViewModel,
-                  cartViewModel: CartViewModel,
-                  favoritesViewModel: FavoritesViewModel
+fun AppNavigation(
+    navController: NavHostController,
+    loginViewModel: LoginViewModel,
+    resetPasswordViewModel: ResetPasswordViewModel,
+    weatherViewModel: WeatherViewModel,
+    cartViewModel: CartViewModel,
+    favoritesViewModel: FavoritesViewModel
 
 ) {
 
@@ -57,7 +58,10 @@ fun AppNavigation(navController: NavHostController,
     val isUserLoggedIn by loginViewModel.navigateToHome.collectAsStateWithLifecycle()
 
     /* Start navigation in login page. Route: login */
-    NavHost(navController = navController, startDestination = if (isUserLoggedIn) "home" else "login") {
+    NavHost(
+        navController = navController,
+        startDestination = if (isUserLoggedIn) "home" else "login"
+    ) {
         composable("login") {
             LoginScreen(
                 loginViewModel = loginViewModel,
@@ -97,7 +101,11 @@ fun AppNavigation(navController: NavHostController,
             arguments = listOf(navArgument("categoryId") { type = NavType.StringType })
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId") ?: "sale"
-            WeatherCategoryScreen(categoryId = categoryId, navController, viewModel = weatherViewModel)
+            WeatherCategoryScreen(
+                categoryId = categoryId,
+                navController,
+                viewModel = weatherViewModel
+            )
         }
 
 
@@ -122,7 +130,7 @@ fun AppNavigation(navController: NavHostController,
                 favoritesViewModel,
                 cartViewModel,
                 onBack = { navController.popBackStack() },
-                onNavigateToCart = { navController.navigate("cart")},
+                onNavigateToCart = { navController.navigate("cart") },
                 onNavigateToChat = { chatPartnerId, productName ->
                     navController.navigate("chat/$chatPartnerId/$productName")
                 }

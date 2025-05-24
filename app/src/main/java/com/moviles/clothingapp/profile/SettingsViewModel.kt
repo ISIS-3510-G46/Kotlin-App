@@ -9,6 +9,8 @@ import android.graphics.BitmapFactory
 import android.location.Location
 import android.net.Uri
 import androidx.annotation.RequiresPermission
+import androidx.core.content.edit
+import androidx.core.graphics.scale
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,8 +24,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
-import androidx.core.content.edit
-import androidx.core.graphics.scale
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -75,7 +75,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 remove("user_location")
                 remove("user_latitude")
             }
-        }}
+        }
+    }
 
 
     fun updateUserName(name: String) {
@@ -111,7 +112,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 }
 
                 // Save new path to SharedPreferences
-                prefs.edit().putString("profile_image_path", file.absolutePath).apply()
+                prefs.edit { putString("profile_image_path", file.absolutePath) }
 
                 withContext(Dispatchers.Main) {
                     _profileImagePath.value = file.absolutePath

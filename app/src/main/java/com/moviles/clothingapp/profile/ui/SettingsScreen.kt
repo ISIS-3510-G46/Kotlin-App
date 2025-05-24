@@ -143,9 +143,7 @@ fun SettingsScreen(
         uri?.let { viewModel.saveProfileImage(it) }
     }
 
-
-
-    // Show error messages
+    // dios quiera que no salga esto
     errorMessage?.let { message ->
         LaunchedEffect(message) {
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
@@ -422,7 +420,11 @@ fun SettingsScreen(
                                 showPhotoOptionsDialog = false
                                 // Create temporary file for camera
                                 val photoFile = File.createTempFile(
-                                    "JPEG_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}_",
+                                    "JPEG_${
+                                        SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(
+                                            Date()
+                                        )
+                                    }_",
                                     ".jpg",
                                     context.cacheDir
                                 )
