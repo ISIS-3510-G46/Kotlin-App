@@ -151,7 +151,7 @@ fun ProfileScreen(
                     ProfileMenuItem(
                         icon = Icons.Rounded.Article,
                         title = "Mis Artículos",
-                        onClick = { navController.navigate("myPosts") }
+                        onClick = { navController.navigate("userPosts") }
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
